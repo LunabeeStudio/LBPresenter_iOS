@@ -1,5 +1,5 @@
 //
-//  ContentPresenter.swift
+//  ContentState.swift
 //  TCAV2
 //
 //  Created by Rémi Lanteri on 02/12/2024.
@@ -9,7 +9,7 @@ import Foundation
 import Combine
 import SwiftUI
 
-struct ContentState: PresenterState {
+struct ContentState: PresenterState, Navigatable, Presentable {
     typealias NavScope = DetailModel
     typealias Presentation = DetailModel
 
@@ -17,7 +17,7 @@ struct ContentState: PresenterState {
         case loading, data(FormData), error(String)
     }
 
-    struct FormData : Equatable {
+    struct FormData: Equatable {
         var name: String
     }
 
@@ -26,7 +26,6 @@ struct ContentState: PresenterState {
     }
 
     var state: UiState
-
     var navigationScope: NavScope?
     var presentationScope: Presentation?
 

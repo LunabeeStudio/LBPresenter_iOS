@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct DetailModel: Identifiable, Equatable, Hashable, Codable {
+struct DetailModel: Identifiable, Equatable, Hashable {
     let id: String
 }
 
@@ -15,8 +15,6 @@ struct Detail: View {
     let model: DetailModel?
 
     var body: some View {
-        VStack {
-            Text(model?.id ?? "no data")
-        }
+        Text(model?.id ?? "no data")
     }
 }
