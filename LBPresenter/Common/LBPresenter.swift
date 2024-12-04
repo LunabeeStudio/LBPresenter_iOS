@@ -32,15 +32,15 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// - Parameters:
     ///   - initialState: The initial state of the presenter. This defines the starting point for state management
     ///     and represents the application's state before any actions are handled.
-    ///   - initialActions: A list of actions to be dispatched immediately after initialization. These actions
+    ///   - initialActions: An optional list of actions to be dispatched immediately after initialization. These actions
     ///     allow for setup logic, such as fetching data or navigating to an initial screen.
     ///   - reducer: The reducer function that handles state transitions and defines any associated side effects.
     ///     The reducer determines how the state evolves in response to actions and can trigger additional
     ///     operations via effects.
-    init(initialState: State, initialActions: [State.Action], reducer: @escaping Reducer) {
+    init(initialState: State, initialActions: [State.Action]? = nil, reducer: @escaping Reducer) {
         state = initialState
         self.reducer = reducer
-        initialActions.forEach(send)
+        initialActions?.forEach(send)
     }
 
     /// Sends an action to the presenter, updating the state and potentially executing a side effect.
