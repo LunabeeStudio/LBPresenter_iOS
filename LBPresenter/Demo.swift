@@ -16,6 +16,9 @@ struct Demo: View {
                     NavigationLink("Simple") {
                         Simple()
                     }
+                    NavigationLink("Action") {
+                        Action()
+                    }
                     NavigationLink("NavAndTextField") {
                         NavAndTextField()
                     }
