@@ -28,6 +28,12 @@ struct Demo: View {
                     NavigationLink("Present") {
                         Present()
                     }
+                    NavigationLink("TextField") {
+                        TextFieldDemo()
+                    }
+                    NavigationLink("Refreshable") {
+                        Refreshable()
+                    }
                     NavigationLink("NavAndTextField") {
                         NavAndTextField()
                     }
