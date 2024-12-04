@@ -12,23 +12,19 @@ struct Push: View {
 
     var body: some View {
         let _ = Self._printChanges()
-        NavigationSplitView {
-            List {
-                VStack {
-                    Button {
-                        presenter.send(.navigate(PushDetailModel(id: "pushed")))
-                    } label: {
-                        Text("push detail")
-                    }
-                    .buttonStyle(.bordered)
+        List {
+            VStack {
+                Button {
+                    presenter.send(.navigate(PushDetailModel(id: "pushed")))
+                } label: {
+                    Text("push detail")
                 }
-                .padding()
+                .buttonStyle(.bordered)
             }
-            .navigationDestination(item: presenter.binding(for: presenter.state.navigationScope, send: PushState.Action.navigate)) { model in
-                PushDetail(model: model)
-            }
-        } detail: {
-            PushDetail(model: nil)
+            .padding()
+        }
+        .navigationDestination(item: presenter.binding(for: presenter.state.navigationScope, send: PushState.Action.navigate)) { model in
+            PushDetail(model: model)
         }
     }
 }

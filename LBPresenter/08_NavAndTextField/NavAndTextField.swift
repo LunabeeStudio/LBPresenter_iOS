@@ -14,11 +14,11 @@ struct NavAndTextField: View {
         let _ = Self._printChanges()
         NavigationSplitView {
             content
-                .navigationDestination(item: presenter.binding(for: presenter.state.navigationScope, send: NavAndTextFieldState.Action.navigate)) { model in
-                    NavAndTextFieldDetail(model: model)
-                }
         } detail: {
             NavAndTextFieldDetail(model: nil)
+        }
+        .navigationDestination(item: presenter.binding(for: presenter.state.navigationScope, send: NavAndTextFieldState.Action.navigate)) { model in
+            NavAndTextFieldDetail(model: model)
         }
     }
 
