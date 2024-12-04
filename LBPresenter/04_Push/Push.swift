@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct Push: View {
-    @StateObject private var presenter: LBPresenter<PushState> = .init(initialState: .init(uiState: .init()), reducer: PushReducer.reducer)
+    @StateObject private var presenter: LBPresenter<PushState> = .init(initialState: .init(uiState: .init(isLoading: false)), reducer: PushReducer.reducer)
 
     var body: some View {
         let _ = Self._printChanges()
@@ -20,6 +20,16 @@ struct Push: View {
                     Text("push detail")
                 }
                 .buttonStyle(.bordered)
+                Button {
+                    presenter.send(.delayNavigate(PushDetailModel(id: "pushed with delay")))
+                } label: {
+                    Text("push detail with delay")
+                }
+                .buttonStyle(.bordered)
+                if presenter.state.uiState.isLoading {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                }
             }
             .padding()
         }

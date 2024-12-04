@@ -92,7 +92,8 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
                 }
                 await currentEffectTask?.value
             } onCancel: {
-                print("cancelled")
+                // Cancel the currently running effect task.
+                currentEffectTask?.cancel()
             }
         case .cancel:
             // Cancel the currently running effect task.

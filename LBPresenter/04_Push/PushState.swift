@@ -11,10 +11,12 @@ import SwiftUI
 struct PushState: PresenterState, Navigatable {
     typealias NavScope = PushDetailModel
 
-    struct UiState: Equatable {}
+    struct UiState: Equatable {
+        var isLoading: Bool
+    }
 
     enum Action: Sendable, Equatable {
-        case navigate(PushDetailModel?)
+        case navigate(PushDetailModel?), delayNavigate(PushDetailModel), removeLoading
     }
 
     var uiState: UiState

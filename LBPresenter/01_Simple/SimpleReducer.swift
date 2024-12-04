@@ -7,6 +7,6 @@
 
 struct SimpleReducer {
     static let reducer: LBPresenter<SimpleState>.Reducer = { state, action in
-        return (state, .none)
+        (state, .none)
     }
 }

@@ -19,7 +19,7 @@ struct Demo: View {
                     NavigationLink("Action") {
                         Action()
                     }
-                    NavigationLink("Side Effects") {
+                    NavigationLink("SideEffects") {
                         SideEffect()
                     }
                     NavigationLink("Push") {
@@ -34,9 +34,10 @@ struct Demo: View {
                     NavigationLink("Refreshable") {
                         Refreshable()
                     }
-                    NavigationLink("NavAndTextField") {
-                        NavAndTextField()
-                    }
+//                    Not working yet, because of NavigationStack
+//                    NavigationLink("NavigationSplit") {
+//                        NavigationSplit()
+//                    }
                 }
             }
         }

@@ -13,8 +13,6 @@ struct TextFieldReducer {
             case let .data(formData):
                 let updatedFormData: TextFieldState.FormData = formData.update(\.name, with: name)
                 return (state.update(\.uiState, with: .data(updatedFormData)), .none)
-            default:
-                return (state, .none)
             }
         }
     }

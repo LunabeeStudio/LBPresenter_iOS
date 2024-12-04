@@ -30,5 +30,5 @@ struct Refreshable: View {
 }
 
 #Preview {
-    NavAndTextField()
+    Refreshable()
 }

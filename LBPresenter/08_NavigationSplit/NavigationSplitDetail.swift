@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-struct DetailModel: Identifiable, Equatable, Hashable {
+struct NavigationSplitDetailModel: Identifiable, Equatable, Hashable {
     let id: String
 }
 
-struct NavAndTextFieldDetail: View {
-    let model: DetailModel?
+struct NavigationSplitDetail: View {
+    let model: NavigationSplitDetailModel?
 
     var body: some View {
         Text(model?.id ?? "no data")

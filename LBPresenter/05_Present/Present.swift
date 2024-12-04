@@ -38,5 +38,5 @@ struct Present: View {
 }
 
 #Preview {
-    NavAndTextField()
+    Present()
 }

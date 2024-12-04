@@ -11,7 +11,16 @@ struct PushReducer {
         case .navigate(nil):
             return (state.update(\.navigationScope, with: nil), .none)
         case let .navigate(model):
-            return (state.update(\.navigationScope, with: model), .none)
+            return (state.update(\.navigationScope, with: model), .run({ send in
+                send(.removeLoading)
+            }))
+        case .removeLoading:
+            return (state.update(\.uiState.isLoading, with: false), .none)
+        case let .delayNavigate(model):
+            return (state.update(\.uiState.isLoading, with: true), .run({ send in
+                try? await Task.sleep(for: .seconds(3))
+                send(.navigate(model))
+            }))
         }
     }
 }
