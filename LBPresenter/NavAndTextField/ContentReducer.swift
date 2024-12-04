@@ -7,53 +7,57 @@
 
 struct ContentReducer {
     static let reducer: LBPresenter<ContentState>.Reducer = { state, action in
-        var mutableState = state
         switch action {
         case .fetchData:
-            return (mutableState, .run { send in
+            return (state, .run { send in
                 do {
                     try await fetchData()
-                    send(.gotData(ContentState.FormData(name: "")))
+                    send(.gotData(ContentState.FormData(name: "", presentationScope: nil)))
                 } catch {
                     send(.error(error.localizedDescription))
                 }
             })
         case .refreshData:
-            return (mutableState, .run { send in
+            return (state, .run { send in
                 do {
                     try await refreshData()
-                    send(.gotData(ContentState.FormData(name: "")))
+                    send(.gotData(ContentState.FormData(name: "", presentationScope: nil)))
                 } catch {
                     send(.error(error.localizedDescription))
                 }
             })
         case .error(let error):
-            mutableState.state = .error(error)
-            return (mutableState, .none)
+            return (state.update(\.state, with: .error(error)), .none)
         case .gotData(let formData):
-            mutableState.state = .data(formData)
-            return (mutableState, .none)
+            return (state.update(\.state, with: .data(formData)), .none)
         case .nameChanged(let name):
-            switch mutableState.state {
-            case .data(let formData):
-                var mutableFormData = formData
-                mutableFormData.name = name
-                mutableState.state = .data(mutableFormData)
-            default: break
+            switch state.state {
+            case let .data(formData):
+                let updatedFormData: ContentState.FormData = formData.update(\.name, with: name)
+                return (state.update(\.state, with: .data(updatedFormData)), .none)
+            default:
+                return (state, .none)
             }
-            return (mutableState, .none)
         case .navigate(nil):
-            mutableState.navigationScope = nil
-            return (mutableState, .none)
-        case .navigate(let model):
-            mutableState.navigationScope = model
-            return (mutableState, .cancel)
+            return (state.update(\.navigationScope, with: nil), .none)
+        case let .navigate(model):
+            return (state.update(\.navigationScope, with: model), .cancel)
         case .present(nil):
-            mutableState.presentationScope = nil
-            return (mutableState, .none)
-        case .present(let model):
-            mutableState.presentationScope = model
-            return (mutableState, .cancel)
+            switch state.state {
+            case let .data(formData):
+                let updatedFormData: ContentState.FormData = formData.update(\.presentationScope, with: nil)
+                return (state.update(\.state, with: .data(updatedFormData)), .none)
+            default:
+                return (state, .none)
+            }
+        case let .present(model):
+            switch state.state {
+            case let .data(formData):
+                let updatedFormData: ContentState.FormData = formData.update(\.presentationScope, with: model)
+                return (state.update(\.state, with: .data(updatedFormData)), .cancel)
+            default:
+                return (state, .none)
+            }
         }
     }
 

@@ -8,17 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var presenter: LBPresenter<ContentState> = .init(initialState: ContentState(state: .loading), reducer: ContentReducer.reducer)
+    @StateObject private var presenter: LBPresenter<ContentState> = .init(initialState: .init(state: .loading), initialActions: [.fetchData], reducer: ContentReducer.reducer)
 
     var body: some View {
         let _ = Self._printChanges()
         NavigationSplitView {
-            content()
-                .onAppear { presenter.send(.fetchData) }
+            content
                 .navigationDestination(item: presenter.binding(for: presenter.state.navigationScope, send: ContentState.Action.navigate)) { model in
-                    Detail(model: model)
-                }
-                .sheet(item: presenter.binding(for: presenter.state.presentationScope, send: ContentState.Action.present)) { model in
                     Detail(model: model)
                 }
         } detail: {
@@ -27,7 +23,7 @@ struct ContentView: View {
     }
 
     @ViewBuilder
-    func content() -> some View {
+    var content: some View {
         switch presenter.state.state {
         case .loading:
             ProgressView()
@@ -65,6 +61,9 @@ struct ContentView: View {
             }
             .refreshable {
                 await presenter.send(.refreshData)
+            }
+            .sheet(item: presenter.binding(for: formData.presentationScope, send: ContentState.Action.present)) { model in
+                Detail(model: model)
             }
         }
     }

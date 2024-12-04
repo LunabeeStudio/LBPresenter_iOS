@@ -28,15 +28,17 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// - Parameters:
     ///   - initialState: The initial state of the presenter.
     ///   - reducer: The reducer function that defines state transitions and handles side effects.
-    init(initialState: State, reducer: @escaping Reducer) {
+    init(initialState: State, initialActions: [State.Action], reducer: @escaping Reducer) {
         state = initialState
         self.reducer = reducer
+        initialActions.forEach(send)
     }
 
     /// Sends an action to the presenter, updating the state and potentially executing a side effect.
     ///
     /// - Parameter action: The action to process through the reducer.
     @Sendable func send(_ action: State.Action) {
+        print("---> send \(action)")
         let (newState, effect) = reducer(state, action)
 
         // Update the state only if it has changed to prevent unnecessary view updates.
@@ -60,7 +62,8 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// Sends an action to the presenter asynchronously, allowing the caller to await its completion.
     ///
     /// - Parameter action: The action to process through the reducer.
-    @Sendable @MainActor func send(_ action: State.Action) async {
+    @Sendable func send(_ action: State.Action) async {
+        print("---> send \(action)")
         let (newState, effect) = reducer(state, action)
 
         // Update the state only if it has changed.
@@ -105,5 +108,15 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
                 self.send(action(newValue))
             }
         )
+    }
+}
+
+// MARK: - Util
+extension Equatable {
+    func update<T: Equatable>(_ keyPath: WritableKeyPath<Self, T>, with value: T) -> Self {
+        var mutable: Self = self
+        guard mutable[keyPath: keyPath] != value else { return self }
+        mutable[keyPath: keyPath] = value
+        return mutable
     }
 }

@@ -11,14 +11,16 @@ import SwiftUI
 
 struct ContentState: PresenterState {
     typealias NavScope = DetailModel
-    typealias Presentation = DetailModel
 
     enum UiState: Equatable {
         case loading, data(FormData), error(String)
     }
 
-    struct FormData : Equatable {
+    struct FormData: Equatable {
+        typealias Presentation = DetailModel
+
         var name: String
+        var presentationScope: Presentation?
     }
 
     enum Action: Sendable, Equatable {
@@ -26,12 +28,9 @@ struct ContentState: PresenterState {
     }
 
     var state: UiState
+    var navigationScope: NavScope? = nil
 
-    var navigationScope: NavScope?
-    var presentationScope: Presentation?
-
-    init(navScope: NavScope? = nil, state: UiState) {
-        self.navigationScope = navScope
+    init(state: UiState) {
         self.state = state
     }
 }
