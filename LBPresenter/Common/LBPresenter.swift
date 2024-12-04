@@ -23,11 +23,20 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// A reference to the currently running effect task, used to manage cancellable async operations.
     private var currentEffectTask: Task<Void, Never>?
 
-    /// Initializes the presenter with an initial state and a reducer.
+    /// Initializes the presenter with an initial state, a list of initial actions to process, and a reducer function.
+    ///
+    /// This initializer sets up the presenter's state and defines how it will handle actions using the provided reducer.
+    /// It also processes any initial actions immediately after the state is initialized, allowing for early setup or
+    /// state transitions as needed.
     ///
     /// - Parameters:
-    ///   - initialState: The initial state of the presenter.
-    ///   - reducer: The reducer function that defines state transitions and handles side effects.
+    ///   - initialState: The initial state of the presenter. This defines the starting point for state management
+    ///     and represents the application's state before any actions are handled.
+    ///   - initialActions: A list of actions to be dispatched immediately after initialization. These actions
+    ///     allow for setup logic, such as fetching data or navigating to an initial screen.
+    ///   - reducer: The reducer function that handles state transitions and defines any associated side effects.
+    ///     The reducer determines how the state evolves in response to actions and can trigger additional
+    ///     operations via effects.
     init(initialState: State, initialActions: [State.Action], reducer: @escaping Reducer) {
         state = initialState
         self.reducer = reducer
@@ -38,7 +47,6 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     ///
     /// - Parameter action: The action to process through the reducer.
     @Sendable func send(_ action: State.Action) {
-        print("---> send \(action)")
         let (newState, effect) = reducer(state, action)
 
         // Update the state only if it has changed to prevent unnecessary view updates.
@@ -63,7 +71,6 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     ///
     /// - Parameter action: The action to process through the reducer.
     @Sendable func send(_ action: State.Action) async {
-        print("---> send \(action)")
         let (newState, effect) = reducer(state, action)
 
         // Update the state only if it has changed.
@@ -101,21 +108,34 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// - Returns: A `Binding` instance that connects the value and action.
     func binding<Value>(for value: Value, send action: @escaping (Value) -> State.Action) -> Binding<Value> {
         Binding(
-            get: {
-                value
-            },
-            set: { newValue, _ in
-                self.send(action(newValue))
+            get: { value },
+            set: { [weak self] newValue, _ in
+                self?.send(action(newValue))
             }
         )
     }
 }
 
 // MARK: - Util
+
+/// An extension on `Equatable` to provide a utility method for updating a property via key paths,
+/// ensuring changes are only applied if the new value is different.
 extension Equatable {
+
+    /// Updates the property at the specified key path with a new value, but only if the new value
+    /// differs from the current value.
+    ///
+    /// This method helps avoid unnecessary mutations, which is particularly useful in state management
+    /// scenarios where reducing redundant updates can improve performance and minimize re-renders in SwiftUI.
+    ///
+    /// - Parameters:
+    ///   - keyPath: A writable key path to the property to be updated.
+    ///   - value: The new value to set for the property.
+    /// - Returns: A copy of the object with the updated property, or the same object if no change was needed.
     func update<T: Equatable>(_ keyPath: WritableKeyPath<Self, T>, with value: T) -> Self {
+        // Check if the current value at the key path differs from the new value.
+        guard self[keyPath: keyPath] != value else { return self }
         var mutable: Self = self
-        guard mutable[keyPath: keyPath] != value else { return self }
         mutable[keyPath: keyPath] = value
         return mutable
     }

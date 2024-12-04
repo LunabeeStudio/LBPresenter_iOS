@@ -27,14 +27,14 @@ struct ContentReducer {
                 }
             })
         case .error(let error):
-            return (state.update(\.state, with: .error(error)), .none)
+            return (state.update(\.uiState, with: .error(error)), .none)
         case let .gotData(formData, presentation):
-            return (state.update(\.state, with: .data(formData, presentation)), .none)
+            return (state.update(\.uiState, with: .data(formData, presentation)), .none)
         case .nameChanged(let name):
-            switch state.state {
+            switch state.uiState {
             case let .data(formData, presentation):
                 let updatedFormData: ContentState.FormData = formData.update(\.name, with: name)
-                return (state.update(\.state, with: .data(updatedFormData, presentation)), .none)
+                return (state.update(\.uiState, with: .data(updatedFormData, presentation)), .none)
             default:
                 return (state, .none)
             }
@@ -43,16 +43,16 @@ struct ContentReducer {
         case let .navigate(model):
             return (state.update(\.navigationScope, with: model), .cancel)
         case .present(nil):
-            switch state.state {
+            switch state.uiState {
             case let .data(formData, _):
-                return (state.update(\.state, with: .data(formData, nil)), .none)
+                return (state.update(\.uiState, with: .data(formData, nil)), .none)
             default:
                 return (state, .none)
             }
         case let .present(model):
-            switch state.state {
+            switch state.uiState {
             case let .data(formData, _):
-                return (state.update(\.state, with: .data(formData, model)), .cancel)
+                return (state.update(\.uiState, with: .data(formData, model)), .cancel)
             default:
                 return (state, .none)
             }

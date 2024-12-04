@@ -9,7 +9,7 @@ import Foundation
 import Combine
 import SwiftUI
 
-struct ContentState: PresenterState {
+struct ContentState: PresenterState, Navigatable {
     typealias NavScope = DetailModel
     typealias Presentation = DetailModel
 
@@ -25,11 +25,10 @@ struct ContentState: PresenterState {
         case navigate(DetailModel?), present(DetailModel?), fetchData, gotData(FormData, Presentation?), nameChanged(String), refreshData, error(String)
     }
 
-    var state: UiState
+    var uiState: UiState
     var navigationScope: NavScope? = nil
-    private var presentationScope: Presentation?
 
-    init(state: UiState) {
-        self.state = state
+    init(uiState: UiState) {
+        self.uiState = uiState
     }
 }
