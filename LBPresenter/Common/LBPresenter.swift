@@ -11,11 +11,16 @@ import SwiftUI
 final class LBPresenter<State: PresenterState>: ObservableObject {
 
     /// Type alias for the reducer function that handles state transitions and produces side effects.
-    typealias Reducer = (_ state: State, _ action: State.Action) -> (State, Effect<State.Action>)
+    typealias Reducer = (_ state: inout State, _ action: State.Action) -> Effect<State.Action>
 
     /// The current state of the presenter, published to notify SwiftUI views of any changes.
     /// The state is `private(set)` to restrict modifications to the presenter logic only.
-    @Published private(set) var state: State
+    private(set) var state: State {
+        willSet {
+            guard newValue != state else { return }
+            objectWillChange.send()
+        }
+    }
 
     /// The reducer function used to compute the next state and potential side effects based on an action.
     private let reducer: Reducer
@@ -47,15 +52,9 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     ///
     /// - Parameter action: The action to process through the reducer.
     @Sendable func send(_ action: State.Action) {
-        let (newState, effect) = reducer(state, action)
-
-        // Update the state only if it has changed to prevent unnecessary view updates.
-        if (newState != state) {
-            state = newState
-        }
-
+        print("---> Send \(action)")
         // Handle the effect produced by the reducer.
-        switch effect {
+        switch reducer(&state, action) {
         case .none:
             break
         case .run(let asyncFunc):
@@ -71,15 +70,9 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     ///
     /// - Parameter action: The action to process through the reducer.
     @Sendable func send(_ action: State.Action) async {
-        let (newState, effect) = reducer(state, action)
-
-        // Update the state only if it has changed.
-        if (newState != state) {
-            state = newState
-        }
-
+        print("---> Send \(action)")
         // Handle the effect produced by the reducer.
-        switch effect {
+        switch reducer(&state, action) {
         case .none:
             break
         case .run(let asyncFunc):
