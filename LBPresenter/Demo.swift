@@ -19,6 +19,15 @@ struct Demo: View {
                     NavigationLink("Action") {
                         Action()
                     }
+                    NavigationLink("Side Effects") {
+                        SideEffect()
+                    }
+                    NavigationLink("Push") {
+                        Push()
+                    }
+                    NavigationLink("Present") {
+                        Present()
+                    }
                     NavigationLink("NavAndTextField") {
                         NavAndTextField()
                     }
