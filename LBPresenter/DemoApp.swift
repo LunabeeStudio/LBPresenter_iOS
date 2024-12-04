@@ -9,7 +9,6 @@ import SwiftUI
 
 @main
 struct TCAV2App: App {
-
     var body: some Scene {
         WindowGroup {
             ContentView()

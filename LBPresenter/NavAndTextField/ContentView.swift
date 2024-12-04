@@ -13,7 +13,7 @@ struct ContentView: View {
     var body: some View {
         let _ = Self._printChanges()
         NavigationSplitView {
-            content()
+            content
                 .onAppear { presenter.send(.fetchData) }
                 .navigationDestination(item: presenter.binding(for: presenter.state.navigationScope, send: ContentState.Action.navigate)) { model in
                     Detail(model: model)
@@ -27,7 +27,7 @@ struct ContentView: View {
     }
 
     @ViewBuilder
-    func content() -> some View {
+    var content: some View {
         switch presenter.state.state {
         case .loading:
             ProgressView()

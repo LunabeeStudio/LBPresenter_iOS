@@ -60,7 +60,7 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// Sends an action to the presenter asynchronously, allowing the caller to await its completion.
     ///
     /// - Parameter action: The action to process through the reducer.
-    @Sendable @MainActor func send(_ action: State.Action) async {
+    @Sendable func send(_ action: State.Action) async {
         let (newState, effect) = reducer(state, action)
 
         // Update the state only if it has changed.
@@ -98,11 +98,9 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// - Returns: A `Binding` instance that connects the value and action.
     func binding<Value>(for value: Value, send action: @escaping (Value) -> State.Action) -> Binding<Value> {
         Binding(
-            get: {
-                value
-            },
-            set: { newValue, _ in
-                self.send(action(newValue))
+            get: { value },
+            set: { [weak self] newValue, _ in
+                self?.send(action(newValue))
             }
         )
     }
