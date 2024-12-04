@@ -8,17 +8,13 @@
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var presenter: LBPresenter<ContentState> = .init(initialState: ContentState(state: .loading), reducer: ContentReducer.reducer)
+    @StateObject private var presenter: LBPresenter<ContentState> = .init(initialState: .init(uiState: .loading), initialActions: [.fetchData], reducer: ContentReducer.reducer)
 
     var body: some View {
         let _ = Self._printChanges()
         NavigationSplitView {
             content
-                .onAppear { presenter.send(.fetchData) }
                 .navigationDestination(item: presenter.binding(for: presenter.state.navigationScope, send: ContentState.Action.navigate)) { model in
-                    Detail(model: model)
-                }
-                .sheet(item: presenter.binding(for: presenter.state.presentationScope, send: ContentState.Action.present)) { model in
                     Detail(model: model)
                 }
         } detail: {
@@ -28,7 +24,7 @@ struct ContentView: View {
 
     @ViewBuilder
     var content: some View {
-        switch presenter.state.state {
+        switch presenter.state.uiState {
         case .loading:
             ProgressView()
                 .progressViewStyle(.circular)
@@ -39,7 +35,7 @@ struct ContentView: View {
             .refreshable {
                 await presenter.send(.refreshData)
             }
-        case .data(let formData):
+        case let .data(formData, presentationScope):
             List {
                 VStack {
                     TextField(text: presenter.binding(for: formData.name, send: ContentState.Action.nameChanged)) {
@@ -65,6 +61,9 @@ struct ContentView: View {
             }
             .refreshable {
                 await presenter.send(.refreshData)
+            }
+            .sheet(item: presenter.binding(for: presentationScope, send: ContentState.Action.present)) { model in
+                Detail(model: model)
             }
         }
     }

@@ -9,12 +9,12 @@ import Foundation
 import Combine
 import SwiftUI
 
-struct ContentState: PresenterState, Navigatable, Presentable {
+struct ContentState: PresenterState, Navigatable {
     typealias NavScope = DetailModel
     typealias Presentation = DetailModel
 
     enum UiState: Equatable {
-        case loading, data(FormData), error(String)
+        case loading, data(FormData, Presentation?), error(String)
     }
 
     struct FormData: Equatable {
@@ -22,15 +22,13 @@ struct ContentState: PresenterState, Navigatable, Presentable {
     }
 
     enum Action: Sendable, Equatable {
-        case navigate(DetailModel?), present(DetailModel?), fetchData, gotData(FormData), nameChanged(String), refreshData, error(String)
+        case navigate(DetailModel?), present(DetailModel?), fetchData, gotData(FormData, Presentation?), nameChanged(String), refreshData, error(String)
     }
 
-    var state: UiState
-    var navigationScope: NavScope?
-    var presentationScope: Presentation?
+    var uiState: UiState
+    var navigationScope: NavScope? = nil
 
-    init(navScope: NavScope? = nil, state: UiState) {
-        self.navigationScope = navScope
-        self.state = state
+    init(uiState: UiState) {
+        self.uiState = uiState
     }
 }
