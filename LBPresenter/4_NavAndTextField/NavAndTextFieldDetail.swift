@@ -11,7 +11,7 @@ struct DetailModel: Identifiable, Equatable, Hashable {
     let id: String
 }
 
-struct Detail: View {
+struct NavAndTextFieldDetail: View {
     let model: DetailModel?
 
     var body: some View {

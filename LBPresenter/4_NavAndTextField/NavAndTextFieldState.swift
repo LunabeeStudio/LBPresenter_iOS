@@ -9,7 +9,7 @@ import Foundation
 import Combine
 import SwiftUI
 
-struct ContentState: PresenterState, Navigatable {
+struct NavAndTextFieldState: PresenterState, Navigatable {
     typealias NavScope = DetailModel
     typealias Presentation = DetailModel
 

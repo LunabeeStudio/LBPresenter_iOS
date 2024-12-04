@@ -8,10 +8,10 @@
 import SwiftUI
 
 @main
-struct TCAV2App: App {
+struct DemoApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavAndTextField()
         }
     }
 }

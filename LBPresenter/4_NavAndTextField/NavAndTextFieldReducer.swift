@@ -5,14 +5,14 @@
 //  Created by Q2 on 03/12/2024.
 //
 
-struct ContentReducer {
-    static let reducer: LBPresenter<ContentState>.Reducer = { state, action in
+struct NavAndTextFieldReducer {
+    static let reducer: LBPresenter<NavAndTextFieldState>.Reducer = { state, action in
         switch action {
         case .fetchData:
             return (state, .run { send in
                 do {
                     try await fetchData()
-                    send(.gotData(ContentState.FormData(name: ""), nil))
+                    send(.gotData(NavAndTextFieldState.FormData(name: ""), nil))
                 } catch {
                     send(.error(error.localizedDescription))
                 }
@@ -21,7 +21,7 @@ struct ContentReducer {
             return (state, .run { send in
                 do {
                     try await refreshData()
-                    send(.gotData(ContentState.FormData(name: ""), nil))
+                    send(.gotData(NavAndTextFieldState.FormData(name: ""), nil))
                 } catch {
                     send(.error(error.localizedDescription))
                 }
@@ -33,7 +33,7 @@ struct ContentReducer {
         case .nameChanged(let name):
             switch state.uiState {
             case let .data(formData, presentation):
-                let updatedFormData: ContentState.FormData = formData.update(\.name, with: name)
+                let updatedFormData: NavAndTextFieldState.FormData = formData.update(\.name, with: name)
                 return (state.update(\.uiState, with: .data(updatedFormData, presentation)), .none)
             default:
                 return (state, .none)

@@ -7,18 +7,18 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    @StateObject private var presenter: LBPresenter<ContentState> = .init(initialState: .init(uiState: .loading), initialActions: [.fetchData], reducer: ContentReducer.reducer)
+struct NavAndTextField: View {
+    @StateObject private var presenter: LBPresenter<NavAndTextFieldState> = .init(initialState: .init(uiState: .loading), initialActions: [.fetchData], reducer: NavAndTextFieldReducer.reducer)
 
     var body: some View {
         let _ = Self._printChanges()
         NavigationSplitView {
             content
-                .navigationDestination(item: presenter.binding(for: presenter.state.navigationScope, send: ContentState.Action.navigate)) { model in
-                    Detail(model: model)
+                .navigationDestination(item: presenter.binding(for: presenter.state.navigationScope, send: NavAndTextFieldState.Action.navigate)) { model in
+                    NavAndTextFieldDetail(model: model)
                 }
         } detail: {
-            Detail(model: nil)
+            NavAndTextFieldDetail(model: nil)
         }
     }
 
@@ -38,7 +38,7 @@ struct ContentView: View {
         case let .data(formData, presentationScope):
             List {
                 VStack {
-                    TextField(text: presenter.binding(for: formData.name, send: ContentState.Action.nameChanged)) {
+                    TextField(text: presenter.binding(for: formData.name, send: NavAndTextFieldState.Action.nameChanged)) {
                         Text("ton nom")
                     }
                     Text(formData.name)
@@ -62,13 +62,13 @@ struct ContentView: View {
             .refreshable {
                 await presenter.send(.refreshData)
             }
-            .sheet(item: presenter.binding(for: presentationScope, send: ContentState.Action.present)) { model in
-                Detail(model: model)
+            .sheet(item: presenter.binding(for: presentationScope, send: NavAndTextFieldState.Action.present)) { model in
+                NavAndTextFieldDetail(model: model)
             }
         }
     }
 }
 
 #Preview {
-    ContentView()
+    NavAndTextField()
 }
