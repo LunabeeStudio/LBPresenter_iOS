@@ -12,7 +12,7 @@ struct ContentReducer {
             return (state, .run { send in
                 do {
                     try await fetchData()
-                    send(.gotData(ContentState.FormData(name: "", presentationScope: nil)))
+                    send(.gotData(ContentState.FormData(name: ""), nil))
                 } catch {
                     send(.error(error.localizedDescription))
                 }
@@ -21,20 +21,20 @@ struct ContentReducer {
             return (state, .run { send in
                 do {
                     try await refreshData()
-                    send(.gotData(ContentState.FormData(name: "", presentationScope: nil)))
+                    send(.gotData(ContentState.FormData(name: ""), nil))
                 } catch {
                     send(.error(error.localizedDescription))
                 }
             })
         case .error(let error):
             return (state.update(\.state, with: .error(error)), .none)
-        case .gotData(let formData):
-            return (state.update(\.state, with: .data(formData)), .none)
+        case let .gotData(formData, presentation):
+            return (state.update(\.state, with: .data(formData, presentation)), .none)
         case .nameChanged(let name):
             switch state.state {
-            case let .data(formData):
+            case let .data(formData, presentation):
                 let updatedFormData: ContentState.FormData = formData.update(\.name, with: name)
-                return (state.update(\.state, with: .data(updatedFormData)), .none)
+                return (state.update(\.state, with: .data(updatedFormData, presentation)), .none)
             default:
                 return (state, .none)
             }
@@ -44,17 +44,15 @@ struct ContentReducer {
             return (state.update(\.navigationScope, with: model), .cancel)
         case .present(nil):
             switch state.state {
-            case let .data(formData):
-                let updatedFormData: ContentState.FormData = formData.update(\.presentationScope, with: nil)
-                return (state.update(\.state, with: .data(updatedFormData)), .none)
+            case let .data(formData, _):
+                return (state.update(\.state, with: .data(formData, nil)), .none)
             default:
                 return (state, .none)
             }
         case let .present(model):
             switch state.state {
-            case let .data(formData):
-                let updatedFormData: ContentState.FormData = formData.update(\.presentationScope, with: model)
-                return (state.update(\.state, with: .data(updatedFormData)), .cancel)
+            case let .data(formData, _):
+                return (state.update(\.state, with: .data(formData, model)), .cancel)
             default:
                 return (state, .none)
             }

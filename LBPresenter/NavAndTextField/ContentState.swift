@@ -1,5 +1,5 @@
 //
-//  ContentPresenter.swift
+//  ContentState.swift
 //  TCAV2
 //
 //  Created by Rémi Lanteri on 02/12/2024.
@@ -11,24 +11,23 @@ import SwiftUI
 
 struct ContentState: PresenterState {
     typealias NavScope = DetailModel
+    typealias Presentation = DetailModel
 
     enum UiState: Equatable {
-        case loading, data(FormData), error(String)
+        case loading, data(FormData, Presentation?), error(String)
     }
 
     struct FormData: Equatable {
-        typealias Presentation = DetailModel
-
         var name: String
-        var presentationScope: Presentation?
     }
 
     enum Action: Sendable, Equatable {
-        case navigate(DetailModel?), present(DetailModel?), fetchData, gotData(FormData), nameChanged(String), refreshData, error(String)
+        case navigate(DetailModel?), present(DetailModel?), fetchData, gotData(FormData, Presentation?), nameChanged(String), refreshData, error(String)
     }
 
     var state: UiState
     var navigationScope: NavScope? = nil
+    private var presentationScope: Presentation?
 
     init(state: UiState) {
         self.state = state

@@ -35,7 +35,7 @@ struct ContentView: View {
             .refreshable {
                 await presenter.send(.refreshData)
             }
-        case .data(let formData):
+        case let .data(formData, presentationScope):
             List {
                 VStack {
                     TextField(text: presenter.binding(for: formData.name, send: ContentState.Action.nameChanged)) {
@@ -62,7 +62,7 @@ struct ContentView: View {
             .refreshable {
                 await presenter.send(.refreshData)
             }
-            .sheet(item: presenter.binding(for: formData.presentationScope, send: ContentState.Action.present)) { model in
+            .sheet(item: presenter.binding(for: presentationScope, send: ContentState.Action.present)) { model in
                 Detail(model: model)
             }
         }
