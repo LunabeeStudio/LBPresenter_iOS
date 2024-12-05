@@ -8,11 +8,10 @@
 import Foundation
 import SwiftUI
 
-struct PresentState: PresenterState {
-    typealias Presentation = PresentDetailModel
+struct PresentState: PresenterState, Equatable {
 
     enum UiState: Equatable {
-        case data(Presentation?)
+        case data(PresentDetailModel?)
     }
 
     enum Action: Sendable, Equatable {

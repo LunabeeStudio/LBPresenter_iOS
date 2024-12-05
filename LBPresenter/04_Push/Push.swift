@@ -34,7 +34,7 @@ struct Push: View {
             .padding()
         }
         .navigationDestination(item: presenter.binding(for: presenter.state.navigationScope, send: PushState.Action.navigate)) { model in
-            PushDetail(model: model) { presenter.send(PushState.Action.navigate(nil)) }
+            PushDetail(pushDetailState: .init(modelId: model.id, back: { presenter.send(PushState.Action.pop) }))
         }
     }
 }

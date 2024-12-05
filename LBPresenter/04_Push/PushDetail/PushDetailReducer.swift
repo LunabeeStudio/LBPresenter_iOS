@@ -9,11 +9,8 @@ struct PushDetailReducer {
     static let reducer: LBPresenter<PushDetailState>.Reducer = { state, action in
         switch action {
         case .back:
-            state.back?()
+            state.back()
             return (state, .none)
-        case let .setup(modelId, back):
-            let newState = state.update(\.uiState, with: .data(modelId: modelId)).updateNotEquatable(\.back, with: back)
-            return (newState, .none)
         }
     }
 }

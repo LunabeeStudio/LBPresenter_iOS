@@ -48,11 +48,7 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// - Parameter action: The action to process through the reducer.
     @Sendable func send(_ action: State.Action) {
         let (newState, effect) = reducer(state, action)
-
-        // Update the state only if it has changed to prevent unnecessary view updates.
-        if (newState != state) {
-            state = newState
-        }
+        state = newState
 
         // Handle the effect produced by the reducer.
         switch effect {
@@ -72,11 +68,7 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// - Parameter action: The action to process through the reducer.
     @Sendable func send(_ action: State.Action) async {
         let (newState, effect) = reducer(state, action)
-
-        // Update the state only if it has changed.
-        if (newState != state) {
-            state = newState
-        }
+        state = newState
 
         // Handle the effect produced by the reducer.
         switch effect {
@@ -117,6 +109,60 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     }
 }
 
+extension LBPresenter where State: Equatable {
+    @Sendable func send(_ action: State.Action) async {
+        let (newState, effect) = reducer(state, action)
+
+        // Update the state only if it has changed.
+        if newState != state {
+            state = newState
+        }
+
+        // Handle the effect produced by the reducer.
+        switch effect {
+        case .none:
+            break
+        case .run(let asyncFunc):
+            // Execute the async effect within a cancellable task.
+            await withTaskCancellationHandler {
+                currentEffectTask = Task {
+                    await asyncFunc { [weak self] action in
+                        self?.send(action)
+                    }
+                }
+                await currentEffectTask?.value
+            } onCancel: {
+                // Cancel the currently running effect task.
+                currentEffectTask?.cancel()
+            }
+        case .cancel:
+            // Cancel the currently running effect task.
+            currentEffectTask?.cancel()
+        }
+    }
+
+    @Sendable func send(_ action: State.Action) {
+        let (newState, effect) = reducer(state, action)
+
+        // Update the state only if it has changed to prevent unnecessary view updates.
+        if newState != state {
+            state = newState
+        }
+
+        // Handle the effect produced by the reducer.
+        switch effect {
+        case .none:
+            break
+        case .run(let asyncFunc):
+            // Execute the async effect, providing a way to send follow-up actions.
+            Task { await asyncFunc(send) }
+        case .cancel:
+            // Cancel any currently running effect task.
+            currentEffectTask?.cancel()
+        }
+    }
+}
+
 // MARK: - Util
 
 /// An extension on `Equatable` to provide a utility method for updating a property via key paths,
@@ -136,13 +182,6 @@ extension Equatable {
     func update<T: Equatable>(_ keyPath: WritableKeyPath<Self, T>, with value: T) -> Self {
         // Check if the current value at the key path differs from the new value.
         guard self[keyPath: keyPath] != value else { return self }
-        var mutable: Self = self
-        mutable[keyPath: keyPath] = value
-        return mutable
-    }
-
-    func updateNotEquatable<T>(_ keyPath: WritableKeyPath<Self, T>, with value: T) -> Self {
-        // Check if the current value at the key path differs from the new value.
         var mutable: Self = self
         mutable[keyPath: keyPath] = value
         return mutable

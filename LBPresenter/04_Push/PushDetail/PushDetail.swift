@@ -9,37 +9,25 @@ import SwiftUI
 
 struct PushDetail: View {
 
-    @StateObject private var presenter: LBPresenter<PushDetailState> = .init(initialState: .init(), reducer: PushDetailReducer.reducer)
+    @StateObject private var presenter: LBPresenter<PushDetailState>
 
-    let model: PushDetailModel
-    let back: @Sendable () -> Void
-
+    init(pushDetailState: PushDetailState) {
+        self._presenter = StateObject(wrappedValue: .init(initialState: pushDetailState, reducer: PushDetailReducer.reducer))
+    }
 
     var body: some View {
         let _ = Self._printChanges()
-        content
-            .task {
-                presenter.send(.setup(modelId: model.id, back: back))
-            }
-    }
-
-    @ViewBuilder
-    var content: some View {
-        switch presenter.state.uiState {
-        case let .data(modelId):
-            List {
-                VStack {
-                    Text(modelId)
-                    Button {
-                        presenter.send(.back)
-                    } label: {
-                        Text("Back")
-                    }
-                    .buttonStyle(.bordered)
+        List {
+            VStack {
+                Text(presenter.state.uiState.modelId)
+                Button {
+                    presenter.send(.back)
+                } label: {
+                    Text("Back")
                 }
-                .padding()
+                .buttonStyle(.bordered)
             }
-        case .idle: EmptyView()
+            .padding()
         }
     }
 }

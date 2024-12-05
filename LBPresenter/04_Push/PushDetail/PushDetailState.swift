@@ -10,22 +10,19 @@ import SwiftUI
 
 struct PushDetailState: PresenterState {
 
-    enum UiState: Equatable {
-        case idle, data(modelId : String)
+    struct UiState: Equatable {
+        var modelId : String
     }
 
     enum Action: Sendable {
-        case back, setup(modelId: String, back: @Sendable () -> Void)
+        case back
     }
 
     var uiState: UiState
-    var back: (() -> Void)? = nil
+    var back: (() -> Void)
 
-    static func == (lhs: PushDetailState, rhs: PushDetailState) -> Bool {
-        return lhs.uiState == rhs.uiState
-    }
-
-    init() {
-        self.uiState = .idle
+    init(modelId: String, back: @escaping () -> Void) {
+        self.uiState = .init(modelId: modelId)
+        self.back = back
     }
 }

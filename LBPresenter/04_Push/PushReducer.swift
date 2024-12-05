@@ -8,7 +8,7 @@
 struct PushReducer {
     static let reducer: LBPresenter<PushState>.Reducer = { state, action in
         switch action {
-        case .navigate(nil):
+        case .navigate(nil), .pop:
             return (state.update(\.navigationScope, with: nil), .none)
         case let .navigate(model):
             return (state.update(\.navigationScope, with: model), .run({ send in

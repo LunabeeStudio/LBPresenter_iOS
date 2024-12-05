@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct TextFieldState: PresenterState {
+struct TextFieldState: PresenterState, Equatable {
 
     enum UiState: Equatable {
         case data(FormData)

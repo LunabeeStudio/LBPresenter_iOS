@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct ActionState: PresenterState {
+struct ActionState: PresenterState, Equatable {
 
     struct UiState: Equatable {
         var count: Int

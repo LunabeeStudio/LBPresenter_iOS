@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct SideEffectState: PresenterState {
+struct SideEffectState: PresenterState, Equatable {
 
     enum UiState: Equatable {
         case loading, data, error

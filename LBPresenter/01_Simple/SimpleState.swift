@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct SimpleState: PresenterState {
+struct SimpleState: PresenterState, Equatable {
 
     enum UiState: Equatable {
         case data

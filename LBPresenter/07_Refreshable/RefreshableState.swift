@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct RefreshableState: PresenterState {
+struct RefreshableState: PresenterState, Equatable {
 
     enum UiState: Equatable {
         case data
