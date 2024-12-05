@@ -12,11 +12,13 @@ import SwiftUI
 final class LBPresenter<State: PresenterState>: ObservableObject {
 
     /// Type alias for the reducer function that handles state transitions and produces side effects.
-    typealias Reducer = @MainActor (_ state: State, _ action: State.Action) -> (State, Effect<State.Action>)
+    typealias Reducer = @MainActor (_ state: inout State, _ action: State.Action) -> Effect<State.Action>
 
     /// The current state of the presenter, published to notify SwiftUI views of any changes.
     /// The state is `private(set)` to restrict modifications to the presenter logic only.
-    @Published private(set) var state: State
+    private(set) var state: State {
+        willSet { updateState(newValue) }
+    }
 
     /// The reducer function used to compute the next state and potential side effects based on an action.
     private let reducer: Reducer
@@ -48,11 +50,8 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     ///
     /// - Parameter action: The action to process through the reducer.
     func send(_ action: State.Action) {
-        let (newState, effect) = reducer(state, action)
-        state = newState
-
         // Handle the effect produced by the reducer.
-        switch effect {
+        switch reducer(&state, action)  {
         case .none:
             break
         case .run(let asyncFunc):
@@ -68,11 +67,8 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     ///
     /// - Parameter action: The action to process through the reducer.
     func send(_ action: State.Action) async {
-        let (newState, effect) = reducer(state, action)
-        state = newState
-
         // Handle the effect produced by the reducer.
-        switch effect {
+        switch reducer(&state, action)  {
         case .none:
             break
         case .run(let asyncFunc):
@@ -110,85 +106,25 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     }
 }
 
-extension LBPresenter where State: Equatable {
-    func send(_ action: State.Action) async {
-        let (newState, effect) = reducer(state, action)
-
-        // Update the state only if it has changed.
-        if newState != state {
-            withAnimation(animated ? .easeInOut : .none) {
-                state = newState
-            }
-        }
-
-        // Handle the effect produced by the reducer.
-        switch effect {
-        case .none:
-            break
-        case .run(let asyncFunc):
-            // Execute the async effect within a cancellable task.
-            await withTaskCancellationHandler {
-                currentEffectTask = Task {
-                    await asyncFunc { [weak self] action in
-                        self?.send(action)
-                    }
-                }
-                await currentEffectTask?.value
-            } onCancel: {
-                // Cancel the currently running effect task.
-                //                currentEffectTask?.cancel()
-            }
-        case .cancel:
-            // Cancel the currently running effect task.
-            currentEffectTask?.cancel()
-        }
-    }
-
-    func send(_ action: State.Action, animated: Bool = true) {
-        let (newState, effect) = reducer(state, action)
-
-        // Update the state only if it has changed to prevent unnecessary view updates.
-        if newState != state {
-            withAnimation(animated ? .easeInOut : .none) {
-                state = newState
-            }
-        }
-
-        // Handle the effect produced by the reducer.
-        switch effect {
-        case .none:
-            break
-        case .run(let asyncFunc):
-            // Execute the async effect, providing a way to send follow-up actions.
-            Task { await asyncFunc(send) }
-        case .cancel:
-            // Cancel any currently running effect task.
-            currentEffectTask?.cancel()
-        }
+private extension LBPresenter {
+    func updateState(_ newValue: State) {
+        if state.isEqual(to: newValue) { return }
+        objectWillChange.send()
     }
 }
-
-// MARK: - Util
-
-/// An extension on `Equatable` to provide a utility method for updating a property via key paths,
-/// ensuring changes are only applied if the new value is different.
-extension Equatable {
-
-    /// Updates the property at the specified key path with a new value, but only if the new value
-    /// differs from the current value.
-    ///
-    /// This method helps avoid unnecessary mutations, which is particularly useful in state management
-    /// scenarios where reducing redundant updates can improve performance and minimize re-renders in SwiftUI.
-    ///
-    /// - Parameters:
-    ///   - keyPath: A writable key path to the property to be updated.
-    ///   - value: The new value to set for the property.
-    /// - Returns: A copy of the object with the updated property, or the same object if no change was needed.
-    func update<T: Equatable>(_ keyPath: WritableKeyPath<Self, T>, with value: T) -> Self {
-        // Check if the current value at the key path differs from the new value.
-        guard self[keyPath: keyPath] != value else { return self }
-        var mutable: Self = self
-        mutable[keyPath: keyPath] = value
-        return mutable
+private extension PresenterState {
+    func isEqual(to rhs: Self) -> Bool {
+        guard let rhs = rhs as? any Equatable else { return false }
+        guard let lhs = self as? any Equatable else { return false }
+        return lhs.isEqual(to: rhs)
+    }
+}
+private extension Equatable {
+    func isEqual(to rhs: Any) -> Bool {
+        if let rhs = rhs as? Self {
+            return self == rhs
+        } else {
+            return false
+        }
     }
 }

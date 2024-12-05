@@ -9,11 +9,11 @@ struct RefreshableReducer {
     static let reducer: LBPresenter<RefreshableState>.Reducer = { state, action in
         switch action {
         case .refreshData:
-            return (state, .run { send in
+            return .run { send in
                 try? await Task.sleep(for: .seconds(3))
-            })
+            }
         case .cancel:
-            return (state, .cancel)
+            return .cancel
         }
     }
 }

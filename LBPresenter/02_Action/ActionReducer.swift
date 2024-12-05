@@ -9,9 +9,11 @@ struct ActionReducer {
     static let reducer: LBPresenter<ActionState>.Reducer = { state, action in
         switch action {
         case .increment:
-            return (state.update(\.uiState.count, with: state.uiState.count + 1), .none)
+            state.uiState.count += 1
+            return .none
         case .decrement:
-            return (state.update(\.uiState.count, with: state.uiState.count - 1), .none)
+            state.uiState.count -= 1
+            return .none
         }
     }
 }

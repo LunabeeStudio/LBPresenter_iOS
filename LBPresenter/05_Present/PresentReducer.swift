@@ -11,12 +11,14 @@ struct PresentReducer {
         case .present(nil):
             switch state.uiState {
             case .data:
-                return (state.update(\.uiState, with: .data(nil)), .none)
+                state.uiState = .data(nil)
+                return .none
             }
         case let .present(model):
             switch state.uiState {
             case .data:
-                return (state.update(\.uiState, with: .data(model)), .cancel)
+                state.uiState = .data(model)
+                return .cancel
             }
         }
     }
