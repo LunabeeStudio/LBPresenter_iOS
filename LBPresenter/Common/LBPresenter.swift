@@ -7,11 +7,12 @@
 
 import SwiftUI
 
+@MainActor
 /// A generic presenter that handles state and effects for a SwiftUI view using a reducer pattern.
 final class LBPresenter<State: PresenterState>: ObservableObject {
 
     /// Type alias for the reducer function that handles state transitions and produces side effects.
-    typealias Reducer = (_ state: State, _ action: State.Action) -> (State, Effect<State.Action>)
+    typealias Reducer = @MainActor (_ state: State, _ action: State.Action) -> (State, Effect<State.Action>)
 
     /// The current state of the presenter, published to notify SwiftUI views of any changes.
     /// The state is `private(set)` to restrict modifications to the presenter logic only.
@@ -40,13 +41,13 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     init(initialState: State, initialActions: [State.Action]? = nil, reducer: @escaping Reducer) {
         state = initialState
         self.reducer = reducer
-        initialActions?.forEach(send)
+        initialActions?.forEach { send($0) }
     }
 
     /// Sends an action to the presenter, updating the state and potentially executing a side effect.
     ///
     /// - Parameter action: The action to process through the reducer.
-    @Sendable func send(_ action: State.Action) {
+    func send(_ action: State.Action) {
         let (newState, effect) = reducer(state, action)
         state = newState
 
@@ -66,7 +67,7 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// Sends an action to the presenter asynchronously, allowing the caller to await its completion.
     ///
     /// - Parameter action: The action to process through the reducer.
-    @Sendable func send(_ action: State.Action) async {
+    func send(_ action: State.Action) async {
         let (newState, effect) = reducer(state, action)
         state = newState
 
@@ -85,7 +86,7 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
                 await currentEffectTask?.value
             } onCancel: {
                 // Cancel the currently running effect task.
-                currentEffectTask?.cancel()
+                //                currentEffectTask?.cancel()
             }
         case .cancel:
             // Cancel the currently running effect task.
@@ -110,12 +111,14 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
 }
 
 extension LBPresenter where State: Equatable {
-    @Sendable func send(_ action: State.Action) async {
+    func send(_ action: State.Action) async {
         let (newState, effect) = reducer(state, action)
 
         // Update the state only if it has changed.
         if newState != state {
-            state = newState
+            withAnimation(animated ? .easeInOut : .none) {
+                state = newState
+            }
         }
 
         // Handle the effect produced by the reducer.
@@ -133,7 +136,7 @@ extension LBPresenter where State: Equatable {
                 await currentEffectTask?.value
             } onCancel: {
                 // Cancel the currently running effect task.
-                currentEffectTask?.cancel()
+                //                currentEffectTask?.cancel()
             }
         case .cancel:
             // Cancel the currently running effect task.
@@ -141,12 +144,14 @@ extension LBPresenter where State: Equatable {
         }
     }
 
-    @Sendable func send(_ action: State.Action) {
+    func send(_ action: State.Action, animated: Bool = true) {
         let (newState, effect) = reducer(state, action)
 
         // Update the state only if it has changed to prevent unnecessary view updates.
         if newState != state {
-            state = newState
+            withAnimation(animated ? .easeInOut : .none) {
+                state = newState
+            }
         }
 
         // Handle the effect produced by the reducer.
