@@ -5,6 +5,8 @@
 //  Created by Q2 on 03/12/2024.
 //
 
+typealias Send<Action> = @Sendable @MainActor (_ action: Action) -> Void
+
 /// Represents the potential side effects that can be produced by a reducer in response to an action.
 ///
 /// - `none`: No side effect will be executed.
@@ -18,7 +20,7 @@ enum Effect<Action> {
     /// An asynchronous operation that can dispatch follow-up actions back to the presenter.
     ///
     /// - Parameter send: A closure to dispatch additional actions to the presenter during or after the operation.
-    case run((_ send: @MainActor (_ action: Action) -> Void) async -> Void)
+    case run((_ send: @escaping Send<Action>) async -> Void)
 
     /// Cancels the currently running effect, if any.
     ///

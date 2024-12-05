@@ -34,6 +34,9 @@ struct Demo: View {
                     NavigationLink("Refreshable") {
                         Refreshable()
                     }
+                    NavigationLink("Published") {
+                        PublishedDemo()
+                    }
                 }
             }
         }
