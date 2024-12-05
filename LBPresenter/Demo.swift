@@ -37,6 +37,9 @@ struct Demo: View {
                     NavigationLink("Published") {
                         PublishedDemo()
                     }
+                    NavigationLink("Form") {
+                        FormDemo()
+                    }
                 }
             }
         }
