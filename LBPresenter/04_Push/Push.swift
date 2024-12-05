@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  TCAV2
+//  LBPresenter
 //
 //  Created by Rémi Lanteri on 02/12/2024.
 //
@@ -34,7 +34,7 @@ struct Push: View {
             .padding()
         }
         .navigationDestination(item: presenter.binding(for: presenter.state.navigationScope, send: PushState.Action.navigate)) { model in
-            PushDetail(model: model)
+            PushDetail(model: model) { presenter.send(PushState.Action.navigate(nil)) }
         }
     }
 }

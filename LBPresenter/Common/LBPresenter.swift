@@ -140,4 +140,11 @@ extension Equatable {
         mutable[keyPath: keyPath] = value
         return mutable
     }
+
+    func updateNotEquatable<T>(_ keyPath: WritableKeyPath<Self, T>, with value: T) -> Self {
+        // Check if the current value at the key path differs from the new value.
+        var mutable: Self = self
+        mutable[keyPath: keyPath] = value
+        return mutable
+    }
 }
