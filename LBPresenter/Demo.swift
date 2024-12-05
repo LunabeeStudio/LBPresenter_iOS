@@ -34,10 +34,6 @@ struct Demo: View {
                     NavigationLink("Refreshable") {
                         Refreshable()
                     }
-//                    Not working yet, because of NavigationStack
-//                    NavigationLink("NavigationSplit") {
-//                        NavigationSplit()
-//                    }
                 }
             }
         }

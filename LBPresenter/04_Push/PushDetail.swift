@@ -14,18 +14,9 @@ struct PushDetailModel: Identifiable, Equatable, Hashable {
 struct PushDetail: View {
     let model: PushDetailModel?
 
-    @Environment(\.dismiss) var dismiss
-
     var body: some View {
         List {
             Text(model?.id ?? "no data")
-
-            Button {
-                dismiss()
-            } label: {
-                Text("back")
-            }
-            .buttonStyle(.bordered)
         }
     }
 }
