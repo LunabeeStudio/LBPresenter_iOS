@@ -10,7 +10,7 @@
 ///
 /// Conforming types represent the current state of the application or feature
 /// and facilitate the handling of user or system-initiated actions.
-protocol PresenterState: Equatable {
+protocol PresenterState {
     /// The type of actions that can be handled by the presenter.
     ///
     /// Actions represent events, user interactions, or commands that trigger

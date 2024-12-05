@@ -1,6 +1,6 @@
 //
 //  ContentState.swift
-//  TCAV2
+//  LBPresenter
 //
 //  Created by Rémi Lanteri on 02/12/2024.
 //
@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct ActionState: PresenterState {
+struct ActionState: PresenterState, Equatable {
 
     struct UiState: Equatable {
         var count: Int
