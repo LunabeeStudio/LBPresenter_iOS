@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-struct DetailModel: Identifiable, Equatable, Hashable {
+struct PresentDetailModel: Identifiable, Equatable, Hashable {
     let id: String
 }
 
-struct Detail: View {
-    let model: DetailModel?
+struct PresentDetail: View {
+    let model: PresentDetailModel?
 
     var body: some View {
         Text(model?.id ?? "no data")
