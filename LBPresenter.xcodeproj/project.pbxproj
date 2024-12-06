@@ -6,14 +6,28 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		93172A3D2D02E97A00F60605 /* Bind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93172A0E2D02E97A00F60605 /* Bind.swift */; };
+		93172A3E2D02E97A00F60605 /* CancellableCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93172A0F2D02E97A00F60605 /* CancellableCollection.swift */; };
+		93172A3F2D02E97A00F60605 /* Effect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93172A102D02E97A00F60605 /* Effect.swift */; };
+		93172A402D02E97A00F60605 /* LBPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93172A112D02E97A00F60605 /* LBPresenter.swift */; };
+		93172A412D02E97A00F60605 /* PresenterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93172A122D02E97A00F60605 /* PresenterState.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		93172A0E2D02E97A00F60605 /* Bind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bind.swift; sourceTree = "<group>"; };
+		93172A0F2D02E97A00F60605 /* CancellableCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancellableCollection.swift; sourceTree = "<group>"; };
+		93172A102D02E97A00F60605 /* Effect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Effect.swift; sourceTree = "<group>"; };
+		93172A112D02E97A00F60605 /* LBPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LBPresenter.swift; sourceTree = "<group>"; };
+		93172A122D02E97A00F60605 /* PresenterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresenterState.swift; sourceTree = "<group>"; };
+		93172A192D02E97A00F60605 /* LBPresenter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LBPresenter.entitlements; sourceTree = "<group>"; };
 		C83BF84B2CFDF10400873704 /* LBPresenter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBPresenter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		C83BF84D2CFDF10400873704 /* LBPresenter */ = {
+		C83BF84D2CFDF10400873704 /* Examples */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = LBPresenter;
+			path = Examples;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -29,11 +43,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		93172A5E2D030B9900F60605 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				93172A0E2D02E97A00F60605 /* Bind.swift */,
+				93172A0F2D02E97A00F60605 /* CancellableCollection.swift */,
+				93172A102D02E97A00F60605 /* Effect.swift */,
+				93172A112D02E97A00F60605 /* LBPresenter.swift */,
+				93172A122D02E97A00F60605 /* PresenterState.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
 		C83BF8422CFDF10400873704 = {
 			isa = PBXGroup;
 			children = (
-				C83BF84D2CFDF10400873704 /* LBPresenter */,
+				93172A5E2D030B9900F60605 /* Sources */,
+				C83BF84D2CFDF10400873704 /* Examples */,
 				C83BF84C2CFDF10400873704 /* Products */,
+				93172A192D02E97A00F60605 /* LBPresenter.entitlements */,
 			);
 			sourceTree = "<group>";
 		};
@@ -61,7 +89,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				C83BF84D2CFDF10400873704 /* LBPresenter */,
+				C83BF84D2CFDF10400873704 /* Examples */,
 			);
 			name = LBPresenter;
 			packageProductDependencies = (
@@ -119,6 +147,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93172A3D2D02E97A00F60605 /* Bind.swift in Sources */,
+				93172A3E2D02E97A00F60605 /* CancellableCollection.swift in Sources */,
+				93172A3F2D02E97A00F60605 /* Effect.swift in Sources */,
+				93172A402D02E97A00F60605 /* LBPresenter.swift in Sources */,
+				93172A412D02E97A00F60605 /* PresenterState.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -244,10 +277,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LBPresenter/LBPresenter.entitlements;
+				CODE_SIGN_ENTITLEMENTS = LBPresenter.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"LBPresenter/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Examples/Preview Content\"";
 				DEVELOPMENT_TEAM = VH79XGK7M2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -284,10 +317,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LBPresenter/LBPresenter.entitlements;
+				CODE_SIGN_ENTITLEMENTS = LBPresenter.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"LBPresenter/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Examples/Preview Content\"";
 				DEVELOPMENT_TEAM = VH79XGK7M2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;

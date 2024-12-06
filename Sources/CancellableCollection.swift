@@ -12,15 +12,15 @@ import Foundation
 /// This helps in organizing and canceling subscriptions efficiently.
 public final class CancellablesCollection {
     // MARK: - Properties
-
+    
     /// Storage for cancellables, grouped by their unique identifiers.
     private var storage: [AnyHashable: Set<AnyCancellable>] = [:]
-
+    
     /// A lock to ensure thread-safe access to the storage.
     private let lock = NSLock()
-
+    
     // MARK: - Methods
-
+    
     /// Inserts a cancellable into the collection under a specific identifier.
     ///
     /// - Parameters:
@@ -34,7 +34,7 @@ public final class CancellablesCollection {
         defer { lock.unlock() }
         self.storage[id, default: []].insert(cancellable)
     }
-
+    
     /// Removes a specific cancellable from the collection associated with a given identifier.
     ///
     /// - Parameters:
@@ -51,7 +51,7 @@ public final class CancellablesCollection {
             self.storage[id] = nil
         }
     }
-
+    
     /// Cancels all cancellables associated with a specific identifier.
     ///
     /// - Parameter id: The identifier whose cancellables should be canceled.
