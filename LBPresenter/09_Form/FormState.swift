@@ -17,7 +17,6 @@ struct FormState: PresenterState, Equatable {
 
     enum BouncingState: Equatable {
         case bouncing
-        case stopped
         case done
     }
 
@@ -31,7 +30,7 @@ struct FormState: PresenterState, Equatable {
      }
 
     enum Action: Sendable, Equatable {
-        case nameChanged(String), emailChanged(String), sliderChanged(Double), validate
+        case nameChanged(String), emailChanged(String), sliderChanged(Double), validate, bounce(BouncingState)
     }
 
     var uiState: UiState

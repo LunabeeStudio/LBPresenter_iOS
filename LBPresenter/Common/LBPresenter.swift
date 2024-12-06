@@ -57,6 +57,9 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
         case .none:
             break
         case let .run(asyncFunc, cancelId):
+            if cancelId != nil {
+                cancellationCancellables.cancel(id: cancelId)
+            }
             let task = Task {
                 await asyncFunc { [weak self] action in
                     self?.send(action)
@@ -81,6 +84,9 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
         case .none:
             break
         case let .run(asyncFunc, cancelId):
+            if cancelId != nil {
+                cancellationCancellables.cancel(id: cancelId)
+            }
             let task = Task {
                 await asyncFunc { [weak self] action in
                     self?.send(action)

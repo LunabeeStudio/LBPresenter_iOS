@@ -8,14 +8,28 @@
 import Foundation
 
 struct FormReducer {
+    private enum CancelID { case bouncing }
+
     static let reducer: LBPresenter<FormState>.Reducer = { state, action in
         switch action {
         case .nameChanged(let name):
             if name != state.uiState.formData.name {
                 state.uiState.formData.name = name
                 state.uiState.formData.errorName = ""
+                return .run({ send in
+                    send(.bounce(.bouncing))
+                    do {
+                        try await Task.sleep(for: .seconds(3))
+                        send(.bounce(.done))
+                    } catch is CancellationError {
+                        print("Task was cancelled")
+                    } catch {
+                        print("ooops! \(error)")
+                    }
+                }, cancelId: CancelID.bouncing)
+            } else {
+                return .none
             }
-            return .none
         case .emailChanged(let email):
             if (email != state.uiState.formData.email) {
                 state.uiState.formData.email = email
@@ -38,6 +52,9 @@ struct FormReducer {
             } else {
                 state.uiState.formData.errorEmail = ""
             }
+            return .none
+        case .bounce(let bounce):
+            state.uiState.bouncingState = bounce
             return .none
         }
     }
