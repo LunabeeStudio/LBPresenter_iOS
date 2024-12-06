@@ -9,18 +9,22 @@ struct PushReducer {
     static let reducer: LBPresenter<PushState>.Reducer = { state, action in
         switch action {
         case .navigate(nil), .pop:
-            return (state.update(\.navigationScope, with: nil), .none)
+            state.navigationScope = nil
+            return .none
         case let .navigate(model):
-            return (state.update(\.navigationScope, with: model), .run({ send in
+            state.navigationScope = model
+            return .run({ send in
                 send(.removeLoading)
-            }))
+            })
         case .removeLoading:
-            return (state.update(\.uiState.isLoading, with: false), .none)
+            state.uiState.isLoading = false
+            return .none
         case let .delayNavigate(model):
-            return (state.update(\.uiState.isLoading, with: true), .run({ send in
+            state.uiState.isLoading = true
+            return .run({ send in
                 try? await Task.sleep(for: .seconds(3))
                 send(.navigate(model))
-            }))
+            })
         }
     }
 }

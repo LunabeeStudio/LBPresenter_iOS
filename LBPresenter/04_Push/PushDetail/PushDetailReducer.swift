@@ -10,7 +10,7 @@ struct PushDetailReducer {
         switch action {
         case .back:
             state.back()
-            return (state, .none)
+            return .none
         }
     }
 }

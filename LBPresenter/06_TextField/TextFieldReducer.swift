@@ -10,9 +10,10 @@ struct TextFieldReducer {
         switch action {
         case .nameChanged(let name):
             switch state.uiState {
-            case let .data(formData):
-                let updatedFormData: TextFieldState.FormData = formData.update(\.name, with: name)
-                return (state.update(\.uiState, with: .data(updatedFormData)), .none)
+            case var .data(formData):
+                formData.name = name
+                state.uiState = .data(formData)
+                return .none
             }
         }
     }

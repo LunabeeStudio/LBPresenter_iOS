@@ -14,31 +14,34 @@ struct PublishedReducer {
     static let reducer: LBPresenter<PublishedState>.Reducer = { state, action in
         switch action {
         case .startTimer:
-            return (state.update(\.uiState, with: .loading), .run { send in
+            state.uiState = .loading
+            return .run { send in
                 await TimerDataSource.shared.startTimer()
                 send(.showData)
-            })
+            }
         case .stopTimer:
-            return (state, .run { send in
+            return .run { send in
                 TimerDataSource.shared.stopTimer()
                 send(.showData)
-            })
+            }
         case .showData:
-            return (state.update(\.uiState, with: .data(timer: nil)), .none)
+            state.uiState = .data(timer: nil)
+            return .none
         case let .timerDidUpdate(date):
-            return (state.update(\.uiState, with: .data(timer: date)), .none)
+            state.uiState = .data(timer: date)
+            return .none
         case .startObserve:
-            return (state, .run { @MainActor send in
+            return .run { @MainActor send in
                 TimerDataSource.shared.observeTimer()
                     .sink {
                         print("update")
                         send(.timerDidUpdate($0))
                     }
                     .store(in: &cancellables)
-            })
+            }
         case .stopObserve:
             cancellables.removeAll()
-            return (state, .none)
+            return .none
         }
     }
 }
