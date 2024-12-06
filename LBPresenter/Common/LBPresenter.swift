@@ -137,26 +137,40 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     }
 }
 
-/// optimisation to not retrigger when state isn't changed but is it really necessary ?
 private extension LBPresenter {
+    /// Updates the state if it's different from the current state.
+    /// Avoids triggering `objectWillChange` unnecessarily.
+    ///
+    /// - Parameter newValue: The new state to update to.
     func updateState(_ newValue: State) {
         if state.isEqual(to: newValue) { return }
         objectWillChange.send()
     }
 }
+
 private extension PresenterState {
+    /// Compares two states for equality.
+    ///
+    /// - Parameter rhs: The other state to compare to.
+    /// - Returns: `true` if the states are considered equal, `false` otherwise.
     func isEqual(to rhs: Self) -> Bool {
-        guard let rhs = rhs as? any Equatable else { return false }
-        guard let lhs = self as? any Equatable else { return false }
-        return lhs.isEqual(to: rhs)
+        // Check if both states conform to `Equatable` and compare them directly.
+        if let lhs = self as? any Equatable,
+           let rhs = rhs as? any Equatable {
+            return lhs.isEqual(to: rhs)
+        }
+        // If not `Equatable`, assume they are different.
+        return false
     }
 }
+
 private extension Equatable {
+    /// Compares this instance to another using dynamic type casting.
+    ///
+    /// - Parameter rhs: The other value to compare to.
+    /// - Returns: `true` if the values are equal, `false` otherwise.
     func isEqual(to rhs: Any) -> Bool {
-        if let rhs = rhs as? Self {
-            return self == rhs
-        } else {
-            return false
-        }
+        guard let rhs = rhs as? Self else { return false }
+        return self == rhs
     }
 }
