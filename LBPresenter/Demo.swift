@@ -32,7 +32,7 @@ struct Demo: View {
                         TextFieldDemo()
                     }
                     NavigationLink("Refreshable") {
-                        Refreshable()
+                        RefreshableAndCancellable()
                     }
                     NavigationLink("Published") {
                         PublishedDemo()

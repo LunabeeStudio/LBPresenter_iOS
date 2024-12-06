@@ -5,7 +5,9 @@
 //  Created by Q2 on 03/12/2024.
 //
 
+@preconcurrency import Combine
 import SwiftUI
+import Foundation
 
 @MainActor
 /// A generic presenter that handles state and effects for a SwiftUI view using a reducer pattern.
@@ -23,8 +25,8 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// The reducer function used to compute the next state and potential side effects based on an action.
     private let reducer: Reducer
 
-    /// A reference to the currently running effect task, used to manage cancellable async operations.
-    private var currentEffectTask: Task<Void, Never>?
+    /// A reference to the currently running effect tasks, used to manage cancellable async operations.
+    private let cancellationCancellables = CancellablesCollection()
 
     /// Initializes the presenter with an initial state, a list of initial actions to process, and a reducer function.
     ///
@@ -54,12 +56,19 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
         switch reducer(&state, action)  {
         case .none:
             break
-        case .run(let asyncFunc):
-            // Execute the async effect, providing a way to send follow-up actions.
-            Task { await asyncFunc(send) }
-        case .cancel:
-            // Cancel any currently running effect task.
-            currentEffectTask?.cancel()
+        case let .run(asyncFunc, cancelId):
+            let task = Task {
+                await asyncFunc { [weak self] action in
+                    self?.send(action)
+                }
+            }
+            let cancellable = AnyCancellable { task.cancel() }
+            if cancelId != nil {
+                cancellationCancellables.insert(cancellable, at: cancelId)
+            }
+        case let .cancel(cancelId):
+            // Cancel the running effect task with the corresponding id.
+            cancellationCancellables.cancel(id: cancelId)
         }
     }
 
@@ -71,22 +80,31 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
         switch reducer(&state, action)  {
         case .none:
             break
-        case .run(let asyncFunc):
+        case let .run(asyncFunc, cancelId):
+            let task = Task {
+                await asyncFunc { [weak self] action in
+                    self?.send(action)
+                }
+            }
             // Execute the async effect within a cancellable task.
             await withTaskCancellationHandler {
-                currentEffectTask = Task {
-                    await asyncFunc { [weak self] action in
-                        self?.send(action)
+                let cancellable = AnyCancellable { task.cancel() }
+                if cancelId != nil {
+                    cancellationCancellables.insert(cancellable, at: cancelId)
+                }
+                defer {
+                    if cancelId != nil {
+                        cancellationCancellables.remove(cancellable, at: cancelId)
                     }
                 }
-                await currentEffectTask?.value
+                await task.value
             } onCancel: {
                 // Cancel the currently running effect task.
-                //                currentEffectTask?.cancel()
+                task.cancel()
             }
-        case .cancel:
-            // Cancel the currently running effect task.
-            currentEffectTask?.cancel()
+        case let .cancel(cancelId):
+            // Cancel the running effect task with the corresponding id.
+            cancellationCancellables.cancel(id: cancelId)
         }
     }
 
@@ -106,6 +124,7 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     }
 }
 
+/// optimisation to not retrigger when state isn't changed but is it really necessary ?
 private extension LBPresenter {
     func updateState(_ newValue: State) {
         if state.isEqual(to: newValue) { return }

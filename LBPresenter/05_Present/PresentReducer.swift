@@ -18,7 +18,7 @@ struct PresentReducer {
             switch state.uiState {
             case .data:
                 state.uiState = .data(model)
-                return .cancel
+                return .none
             }
         }
     }
