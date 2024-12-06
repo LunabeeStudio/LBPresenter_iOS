@@ -68,6 +68,13 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
             let cancellable = AnyCancellable { task.cancel() }
             if cancelId != nil {
                 cancellationCancellables.insert(cancellable, at: cancelId)
+                Task {
+                    defer {
+                        cancellationCancellables.remove(cancellable, at: cancelId)
+                    }
+                    // Wait for the task to finish and clean up after completion
+                    _ = await task.result // Wait for the task to complete
+                }
             }
         case let .cancel(cancelId):
             // Cancel the running effect task with the corresponding id.

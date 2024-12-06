@@ -11,8 +11,9 @@ import SwiftUI
 struct FormState: PresenterState, Equatable {
 
     struct UiState: Equatable {
-        var formData: FormData
-        var bouncingState: BouncingState
+        var formData: FormData = .init(name: "", email: "", slider: 5, errorName: "", errorEmail: "")
+        var bouncingState: BouncingState = .done
+        var field: Field? = .name
     }
 
     enum BouncingState: Equatable {
@@ -27,15 +28,17 @@ struct FormState: PresenterState, Equatable {
 
         var errorName: String
         var errorEmail: String
-     }
+    }
+
+    enum Field: Hashable {
+        case none
+        case name
+        case email
+    }
 
     enum Action: Sendable, Equatable {
-        case nameChanged(String), emailChanged(String), sliderChanged(Double), validate, bounce(BouncingState)
+        case nameChanged(String), emailChanged(String), sliderChanged(Double), validate, bounce(BouncingState), focusChanged(Field?)
     }
 
-    var uiState: UiState
-
-    init(uiState: UiState) {
-        self.uiState = uiState
-    }
+    var uiState: UiState = .init()
 }

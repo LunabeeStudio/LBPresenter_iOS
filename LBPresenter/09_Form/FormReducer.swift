@@ -40,21 +40,29 @@ struct FormReducer {
             state.uiState.formData.slider = slider
             return .none
         case .validate:
-            if state.uiState.formData.name.isEmpty {
-                state.uiState.formData.errorName = "Name is required"
-            } else {
-                state.uiState.formData.errorName = ""
-            }
+            var nextFocus: FormState.Field? = nil
             if state.uiState.formData.email.isEmpty {
                 state.uiState.formData.errorEmail = "Email is required"
+                nextFocus = .email
             } else if !validateEmail(state.uiState.formData.email) {
                 state.uiState.formData.errorEmail = "Invalid email"
+                nextFocus = .email
             } else {
                 state.uiState.formData.errorEmail = ""
             }
+            if state.uiState.formData.name.isEmpty {
+                state.uiState.formData.errorName = "Name is required"
+                nextFocus = .name
+            } else {
+                state.uiState.formData.errorName = ""
+            }
+            state.uiState.field = nextFocus
             return .none
         case .bounce(let bounce):
             state.uiState.bouncingState = bounce
+            return .none
+        case .focusChanged(let field):
+            state.uiState.field = field
             return .none
         }
     }

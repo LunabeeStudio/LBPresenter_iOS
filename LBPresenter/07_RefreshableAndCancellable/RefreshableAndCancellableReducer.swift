@@ -13,7 +13,13 @@ struct RefreshableAndCancellableReducer {
         switch action {
         case .refreshData:
             return .run({ send in
-                try? await Task.sleep(for: .seconds(3))
+                do {
+                    try await Task.sleep(for: .seconds(3))
+                } catch is CancellationError {
+                    print("Task was cancelled")
+                } catch {
+                    print("ooops! \(error)")
+                }
             }, cancelId: CancelID.refreshable)
         case .cancel:
             return .cancel(cancelId: CancelID.refreshable)

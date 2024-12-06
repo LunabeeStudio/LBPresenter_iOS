@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct FormDemo: View {
-    @StateObject private var presenter: LBPresenter<FormState> = .init(initialState: .init(uiState: .init(formData: FormState.FormData(name: "", email: "", slider: 5, errorName: "", errorEmail: ""), bouncingState: .done)), reducer: FormReducer.reducer)
+    @StateObject private var presenter: LBPresenter<FormState> = .init(initialState: .init(), reducer: FormReducer.reducer)
+
+    @FocusState var focus: FormState.Field?
 
     var body: some View {
         let _ = Self._printChanges()
@@ -20,6 +22,7 @@ struct FormDemo: View {
             }
             .autocapitalization(.none)
             .keyboardType(.namePhonePad)
+            .focused($focus, equals: .name)
             if !formData.errorName.isEmpty {
                 Text(formData.errorName)
                     .foregroundColor(.red)
@@ -30,6 +33,7 @@ struct FormDemo: View {
             }
             .autocapitalization(.none)
             .keyboardType(.emailAddress)
+            .focused($focus, equals: .email)
             if !formData.errorEmail.isEmpty {
                 Text(formData.errorEmail)
                     .foregroundColor(.red)
@@ -47,6 +51,7 @@ struct FormDemo: View {
             }
             Text("Bouncing = \(uiState.bouncingState)")
         }
+        .bind(presenter.binding(for: uiState.field, send: FormState.Action.focusChanged), to: $focus)
         .navigationTitle("Bindings form")
     }
 }
