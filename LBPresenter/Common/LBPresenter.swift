@@ -57,7 +57,7 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
         case .none:
             break
         case let .run(asyncFunc, cancelId):
-            if cancelId != nil {
+            if let cancelId = cancelId {
                 cancellationCancellables.cancel(id: cancelId)
             }
             let task = Task {
@@ -66,7 +66,7 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
                 }
             }
             let cancellable = AnyCancellable { task.cancel() }
-            if cancelId != nil {
+            if let cancelId = cancelId {
                 cancellationCancellables.insert(cancellable, at: cancelId)
                 Task {
                     defer {
@@ -91,7 +91,7 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
         case .none:
             break
         case let .run(asyncFunc, cancelId):
-            if cancelId != nil {
+            if let cancelId = cancelId {
                 cancellationCancellables.cancel(id: cancelId)
             }
             let task = Task {
@@ -102,11 +102,11 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
             // Execute the async effect within a cancellable task.
             await withTaskCancellationHandler {
                 let cancellable = AnyCancellable { task.cancel() }
-                if cancelId != nil {
+                if let cancelId = cancelId {
                     cancellationCancellables.insert(cancellable, at: cancelId)
                 }
                 defer {
-                    if cancelId != nil {
+                    if let cancelId = cancelId {
                         cancellationCancellables.remove(cancellable, at: cancelId)
                     }
                 }
