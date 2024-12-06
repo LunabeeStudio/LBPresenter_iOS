@@ -67,15 +67,15 @@ where ModelValue.Value == ViewValue.Value, ModelValue.Value: Equatable {
                 guard self.viewValue.wrappedValue != self.modelValue.wrappedValue else { return }
                 self.viewValue.wrappedValue = self.modelValue.wrappedValue
             }
-            .onChange(of: self.modelValue.wrappedValue) {
-                guard self.viewValue.wrappedValue != $0
+            .onChange(of: self.modelValue.wrappedValue) { oldValue, newValue in
+                guard self.viewValue.wrappedValue != newValue
                 else { return }
-                self.viewValue.wrappedValue = $0
+                self.viewValue.wrappedValue = newValue
             }
-            .onChange(of: self.viewValue.wrappedValue) {
-                guard self.modelValue.wrappedValue != $0
+            .onChange(of: self.viewValue.wrappedValue) { oldValue, newValue in
+                guard self.modelValue.wrappedValue != newValue
                 else { return }
-                self.modelValue.wrappedValue = $0
+                self.modelValue.wrappedValue = newValue
             }
     }
 }
