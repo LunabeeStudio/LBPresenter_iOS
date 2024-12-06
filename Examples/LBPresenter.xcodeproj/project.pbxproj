@@ -7,29 +7,74 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		93172A3D2D02E97A00F60605 /* Bind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93172A0E2D02E97A00F60605 /* Bind.swift */; };
-		93172A3E2D02E97A00F60605 /* CancellableCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93172A0F2D02E97A00F60605 /* CancellableCollection.swift */; };
-		93172A3F2D02E97A00F60605 /* Effect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93172A102D02E97A00F60605 /* Effect.swift */; };
-		93172A402D02E97A00F60605 /* LBPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93172A112D02E97A00F60605 /* LBPresenter.swift */; };
-		93172A412D02E97A00F60605 /* PresenterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93172A122D02E97A00F60605 /* PresenterState.swift */; };
-		932E4BF62D032F97009885EB /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932E4BF52D032F90009885EB /* Package.swift */; };
+		932E4C372D0337A3009885EB /* DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932E4C2F2D0337A3009885EB /* DemoApp.swift */; };
+		932E4C3F2D0337A3009885EB /* Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932E4C2E2D0337A3009885EB /* Demo.swift */; };
+		932E4C562D0337A3009885EB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 932E4C2D2D0337A3009885EB /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		93172A0E2D02E97A00F60605 /* Bind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bind.swift; sourceTree = "<group>"; };
-		93172A0F2D02E97A00F60605 /* CancellableCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CancellableCollection.swift; sourceTree = "<group>"; };
-		93172A102D02E97A00F60605 /* Effect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Effect.swift; sourceTree = "<group>"; };
-		93172A112D02E97A00F60605 /* LBPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LBPresenter.swift; sourceTree = "<group>"; };
-		93172A122D02E97A00F60605 /* PresenterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresenterState.swift; sourceTree = "<group>"; };
 		93172A192D02E97A00F60605 /* LBPresenter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LBPresenter.entitlements; sourceTree = "<group>"; };
-		932E4BF52D032F90009885EB /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
-		C83BF84B2CFDF10400873704 /* LBPresenter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBPresenter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		932E4C2D2D0337A3009885EB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		932E4C2E2D0337A3009885EB /* Demo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Demo.swift; sourceTree = "<group>"; };
+		932E4C2F2D0337A3009885EB /* DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoApp.swift; sourceTree = "<group>"; };
+		932E4D002D033871009885EB /* LBPresenter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBPresenter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		C83BF84D2CFDF10400873704 /* Examples */ = {
+		932E4C5C2D0337E6009885EB /* Sources */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Examples;
+			name = Sources;
+			path = ../Sources;
+			sourceTree = SOURCE_ROOT;
+		};
+		932E4CB42D033858009885EB /* 01_Simple */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 01_Simple;
+			sourceTree = "<group>";
+		};
+		932E4CB82D033858009885EB /* 02_Action */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 02_Action;
+			sourceTree = "<group>";
+		};
+		932E4CBC2D033858009885EB /* 03_SideEffect */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 03_SideEffect;
+			sourceTree = "<group>";
+		};
+		932E4CC52D033858009885EB /* 04_Push */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 04_Push;
+			sourceTree = "<group>";
+		};
+		932E4CCA2D033858009885EB /* 05_Present */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 05_Present;
+			sourceTree = "<group>";
+		};
+		932E4CCE2D033858009885EB /* 06_TextField */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 06_TextField;
+			sourceTree = "<group>";
+		};
+		932E4CD22D033858009885EB /* 07_RefreshableAndCancellable */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 07_RefreshableAndCancellable;
+			sourceTree = "<group>";
+		};
+		932E4CD72D033858009885EB /* 08_Published */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 08_Published;
+			sourceTree = "<group>";
+		};
+		932E4CDB2D033858009885EB /* 09_Form */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 09_Form;
+			sourceTree = "<group>";
+		};
+		932E4CDD2D033858009885EB /* Preview Content */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -45,35 +90,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		93172A5E2D030B9900F60605 /* Sources */ = {
-			isa = PBXGroup;
-			children = (
-				93172A0E2D02E97A00F60605 /* Bind.swift */,
-				93172A0F2D02E97A00F60605 /* CancellableCollection.swift */,
-				93172A102D02E97A00F60605 /* Effect.swift */,
-				93172A112D02E97A00F60605 /* LBPresenter.swift */,
-				93172A122D02E97A00F60605 /* PresenterState.swift */,
-			);
-			path = Sources;
-			sourceTree = "<group>";
-		};
 		C83BF8422CFDF10400873704 = {
 			isa = PBXGroup;
 			children = (
-				932E4BF52D032F90009885EB /* Package.swift */,
-				93172A5E2D030B9900F60605 /* Sources */,
-				C83BF84D2CFDF10400873704 /* Examples */,
-				C83BF84C2CFDF10400873704 /* Products */,
+				932E4CB42D033858009885EB /* 01_Simple */,
+				932E4CB82D033858009885EB /* 02_Action */,
+				932E4CBC2D033858009885EB /* 03_SideEffect */,
+				932E4CC52D033858009885EB /* 04_Push */,
+				932E4CCA2D033858009885EB /* 05_Present */,
+				932E4CCE2D033858009885EB /* 06_TextField */,
+				932E4CD22D033858009885EB /* 07_RefreshableAndCancellable */,
+				932E4CD72D033858009885EB /* 08_Published */,
+				932E4CDB2D033858009885EB /* 09_Form */,
+				932E4CDD2D033858009885EB /* Preview Content */,
+				932E4C5C2D0337E6009885EB /* Sources */,
+				932E4C2D2D0337A3009885EB /* Assets.xcassets */,
+				932E4C2E2D0337A3009885EB /* Demo.swift */,
+				932E4C2F2D0337A3009885EB /* DemoApp.swift */,
 				93172A192D02E97A00F60605 /* LBPresenter.entitlements */,
+				932E4D002D033871009885EB /* LBPresenter.app */,
 			);
-			sourceTree = "<group>";
-		};
-		C83BF84C2CFDF10400873704 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				C83BF84B2CFDF10400873704 /* LBPresenter.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -92,13 +128,23 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				C83BF84D2CFDF10400873704 /* Examples */,
+				932E4C5C2D0337E6009885EB /* Sources */,
+				932E4CB42D033858009885EB /* 01_Simple */,
+				932E4CB82D033858009885EB /* 02_Action */,
+				932E4CBC2D033858009885EB /* 03_SideEffect */,
+				932E4CC52D033858009885EB /* 04_Push */,
+				932E4CCA2D033858009885EB /* 05_Present */,
+				932E4CCE2D033858009885EB /* 06_TextField */,
+				932E4CD22D033858009885EB /* 07_RefreshableAndCancellable */,
+				932E4CD72D033858009885EB /* 08_Published */,
+				932E4CDB2D033858009885EB /* 09_Form */,
+				932E4CDD2D033858009885EB /* Preview Content */,
 			);
 			name = LBPresenter;
 			packageProductDependencies = (
 			);
 			productName = TCAV2;
-			productReference = C83BF84B2CFDF10400873704 /* LBPresenter.app */;
+			productReference = 932E4D002D033871009885EB /* LBPresenter.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -126,7 +172,7 @@
 			mainGroup = C83BF8422CFDF10400873704;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = C83BF84C2CFDF10400873704 /* Products */;
+			productRefGroup = C83BF8422CFDF10400873704;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -140,6 +186,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				932E4C562D0337A3009885EB /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -150,12 +197,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				93172A3D2D02E97A00F60605 /* Bind.swift in Sources */,
-				93172A3E2D02E97A00F60605 /* CancellableCollection.swift in Sources */,
-				93172A3F2D02E97A00F60605 /* Effect.swift in Sources */,
-				932E4BF62D032F97009885EB /* Package.swift in Sources */,
-				93172A402D02E97A00F60605 /* LBPresenter.swift in Sources */,
-				93172A412D02E97A00F60605 /* PresenterState.swift in Sources */,
+				932E4C372D0337A3009885EB /* DemoApp.swift in Sources */,
+				932E4C3F2D0337A3009885EB /* Demo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -284,7 +327,7 @@
 				CODE_SIGN_ENTITLEMENTS = LBPresenter.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Examples/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = VH79XGK7M2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -324,7 +367,7 @@
 				CODE_SIGN_ENTITLEMENTS = LBPresenter.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Examples/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = VH79XGK7M2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
