@@ -12,6 +12,7 @@
 		93172A3F2D02E97A00F60605 /* Effect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93172A102D02E97A00F60605 /* Effect.swift */; };
 		93172A402D02E97A00F60605 /* LBPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93172A112D02E97A00F60605 /* LBPresenter.swift */; };
 		93172A412D02E97A00F60605 /* PresenterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93172A122D02E97A00F60605 /* PresenterState.swift */; };
+		932E4BF62D032F97009885EB /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932E4BF52D032F90009885EB /* Package.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +22,7 @@
 		93172A112D02E97A00F60605 /* LBPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LBPresenter.swift; sourceTree = "<group>"; };
 		93172A122D02E97A00F60605 /* PresenterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresenterState.swift; sourceTree = "<group>"; };
 		93172A192D02E97A00F60605 /* LBPresenter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LBPresenter.entitlements; sourceTree = "<group>"; };
+		932E4BF52D032F90009885EB /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		C83BF84B2CFDF10400873704 /* LBPresenter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBPresenter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -58,6 +60,7 @@
 		C83BF8422CFDF10400873704 = {
 			isa = PBXGroup;
 			children = (
+				932E4BF52D032F90009885EB /* Package.swift */,
 				93172A5E2D030B9900F60605 /* Sources */,
 				C83BF84D2CFDF10400873704 /* Examples */,
 				C83BF84C2CFDF10400873704 /* Products */,
@@ -150,6 +153,7 @@
 				93172A3D2D02E97A00F60605 /* Bind.swift in Sources */,
 				93172A3E2D02E97A00F60605 /* CancellableCollection.swift in Sources */,
 				93172A3F2D02E97A00F60605 /* Effect.swift in Sources */,
+				932E4BF62D032F97009885EB /* Package.swift in Sources */,
 				93172A402D02E97A00F60605 /* LBPresenter.swift in Sources */,
 				93172A412D02E97A00F60605 /* PresenterState.swift in Sources */,
 			);
