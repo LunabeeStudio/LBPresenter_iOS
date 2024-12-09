@@ -5,7 +5,9 @@
 //  Created by Q2 on 03/12/2024.
 //
 
+@preconcurrency import Combine
 import SwiftUI
+import Foundation
 
 @MainActor
 /// A generic presenter that handles state and effects for a SwiftUI view using a reducer pattern.
@@ -23,8 +25,8 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// The reducer function used to compute the next state and potential side effects based on an action.
     private let reducer: Reducer
 
-    /// A reference to the currently running effect task, used to manage cancellable async operations.
-    private var currentEffectTask: Task<Void, Never>?
+    /// A reference to the currently running effect tasks, used to manage cancellable async operations.
+    private let cancellationCancellables = CancellablesCollection()
 
     /// Initializes the presenter with an initial state, a list of initial actions to process, and a reducer function.
     ///
@@ -54,12 +56,29 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
         switch reducer(&state, action)  {
         case .none:
             break
-        case .run(let asyncFunc):
-            // Execute the async effect, providing a way to send follow-up actions.
-            Task { await asyncFunc(send) }
-        case .cancel:
-            // Cancel any currently running effect task.
-            currentEffectTask?.cancel()
+        case let .run(asyncFunc, cancelId):
+            if let cancelId = cancelId {
+                cancellationCancellables.cancel(id: cancelId)
+            }
+            let task = Task {
+                await asyncFunc { [weak self] action in
+                    self?.send(action)
+                }
+            }
+            let cancellable = AnyCancellable { task.cancel() }
+            if let cancelId = cancelId {
+                cancellationCancellables.insert(cancellable, at: cancelId)
+                Task {
+                    defer {
+                        cancellationCancellables.remove(cancellable, at: cancelId)
+                    }
+                    // Wait for the task to finish and clean up after completion
+                    _ = await task.result // Wait for the task to complete
+                }
+            }
+        case let .cancel(cancelId):
+            // Cancel the running effect task with the corresponding id.
+            cancellationCancellables.cancel(id: cancelId)
         }
     }
 
@@ -71,22 +90,34 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
         switch reducer(&state, action)  {
         case .none:
             break
-        case .run(let asyncFunc):
+        case let .run(asyncFunc, cancelId):
+            if let cancelId = cancelId {
+                cancellationCancellables.cancel(id: cancelId)
+            }
+            let task = Task {
+                await asyncFunc { [weak self] action in
+                    self?.send(action)
+                }
+            }
             // Execute the async effect within a cancellable task.
             await withTaskCancellationHandler {
-                currentEffectTask = Task {
-                    await asyncFunc { [weak self] action in
-                        self?.send(action)
+                let cancellable = AnyCancellable { task.cancel() }
+                if let cancelId = cancelId {
+                    cancellationCancellables.insert(cancellable, at: cancelId)
+                }
+                defer {
+                    if let cancelId = cancelId {
+                        cancellationCancellables.remove(cancellable, at: cancelId)
                     }
                 }
-                await currentEffectTask?.value
+                await task.value
             } onCancel: {
                 // Cancel the currently running effect task.
-                //                currentEffectTask?.cancel()
+                task.cancel()
             }
-        case .cancel:
-            // Cancel the currently running effect task.
-            currentEffectTask?.cancel()
+        case let .cancel(cancelId):
+            // Cancel the running effect task with the corresponding id.
+            cancellationCancellables.cancel(id: cancelId)
         }
     }
 
@@ -107,24 +138,39 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
 }
 
 private extension LBPresenter {
+    /// Updates the state if it's different from the current state.
+    /// Avoids triggering `objectWillChange` unnecessarily.
+    ///
+    /// - Parameter newValue: The new state to update to.
     func updateState(_ newValue: State) {
         if state.isEqual(to: newValue) { return }
         objectWillChange.send()
     }
 }
+
 private extension PresenterState {
+    /// Compares two states for equality.
+    ///
+    /// - Parameter rhs: The other state to compare to.
+    /// - Returns: `true` if the states are considered equal, `false` otherwise.
     func isEqual(to rhs: Self) -> Bool {
-        guard let rhs = rhs as? any Equatable else { return false }
-        guard let lhs = self as? any Equatable else { return false }
-        return lhs.isEqual(to: rhs)
+        // Check if both states conform to `Equatable` and compare them directly.
+        if let lhs = self as? any Equatable,
+           let rhs = rhs as? any Equatable {
+            return lhs.isEqual(to: rhs)
+        }
+        // If not `Equatable`, assume they are different.
+        return false
     }
 }
+
 private extension Equatable {
+    /// Compares this instance to another using dynamic type casting.
+    ///
+    /// - Parameter rhs: The other value to compare to.
+    /// - Returns: `true` if the values are equal, `false` otherwise.
     func isEqual(to rhs: Any) -> Bool {
-        if let rhs = rhs as? Self {
-            return self == rhs
-        } else {
-            return false
-        }
+        guard let rhs = rhs as? Self else { return false }
+        return self == rhs
     }
 }

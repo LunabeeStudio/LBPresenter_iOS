@@ -16,7 +16,7 @@ struct TextFieldDemo: View {
         case let .data(formData):
             List {
                 VStack {
-                    TextField(text: presenter.binding(for: formData.name, send:  TextFieldState.Action.nameChanged)) {
+                    TextField(text: presenter.binding(for: formData.name, send: TextFieldState.Action.nameChanged)) {
                         Text("ton nom")
                     }
                     Text(formData.name)
