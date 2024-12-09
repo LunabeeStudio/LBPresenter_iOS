@@ -86,7 +86,7 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// Sends an action to the presenter asynchronously, allowing the caller to await its completion.
     ///
     /// - Parameter action: The action to process through the reducer.
-    func send(_ action: State.Action, _ transaction: Transaction? = nil) async {
+    fileprivate func send(_ action: State.Action, _ transaction: Transaction? = nil) async {
         // Handle the effect produced by the reducer.
         let effect: Effect<State.Action> = withTransaction(transaction ?? .init()) { reducer(&state, action) }
         switch effect {
@@ -174,5 +174,23 @@ private extension Equatable {
     func isEqual(to rhs: Any) -> Bool {
         guard let rhs = rhs as? Self else { return false }
         return self == rhs
+    }
+}
+
+extension View {
+    func task<State: PresenterState>(
+        _ presenter: LBPresenter<State>,
+        action: State.Action) -> some View where State.Action: Sendable {
+        self.task {
+            await presenter.send(action)
+        }
+    }
+
+    func refreshable<State: PresenterState>(
+        _ presenter: LBPresenter<State>,
+        action: State.Action) -> some View where State.Action: Sendable {
+        self.refreshable {
+            await presenter.send(action)
+        }
     }
 }

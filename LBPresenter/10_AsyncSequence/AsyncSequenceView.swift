@@ -25,7 +25,7 @@ struct AsyncSequenceView: View {
                 .progressViewStyle(.circular)
         case let .data(date):
             List {
-                Text(date, format: .dateTime.second(.twoDigits))
+                Text(date, format: .dateTime.hour().minute().second(.twoDigits))
             }
         }
     }
