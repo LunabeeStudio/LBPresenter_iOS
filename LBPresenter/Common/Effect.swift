@@ -5,7 +5,9 @@
 //  Created by Q2 on 03/12/2024.
 //
 
-typealias Send<Action> = @Sendable @MainActor (_ action: Action) -> Void
+import SwiftUI
+
+typealias Send<Action> = @Sendable @MainActor (_ action: Action, _ transaction: Transaction?) -> Void
 
 /// Represents the potential side effects that can be produced by a reducer in response to an action.
 ///
