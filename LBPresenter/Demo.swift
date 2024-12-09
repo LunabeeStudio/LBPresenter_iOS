@@ -40,6 +40,9 @@ struct Demo: View {
                     NavigationLink("Form") {
                         FormDemo()
                     }
+                    NavigationLink("Async Sequence") {
+                        AsyncSequenceView()
+                    }
                 }
             }
         }

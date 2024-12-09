@@ -17,12 +17,12 @@ struct PublishedReducer {
             state.uiState = .loading
             return .run { send in
                 await TimerDataSource.shared.startTimer()
-                send(.showData)
+                send(.showData, .init(animation: .easeInOut))
             }
         case .stopTimer:
             return .run { send in
                 TimerDataSource.shared.stopTimer()
-                send(.showData)
+                send(.showData, .init(animation: .easeInOut))
             }
         case .showData:
             state.uiState = .data(timer: nil)
@@ -35,7 +35,7 @@ struct PublishedReducer {
                 TimerDataSource.shared.observeTimer()
                     .sink {
                         print("update")
-                        send(.timerDidUpdate($0))
+                        send(.timerDidUpdate($0), nil)
                     }
                     .store(in: &cancellables)
             }

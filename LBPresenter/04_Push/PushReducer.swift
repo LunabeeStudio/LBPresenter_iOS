@@ -13,9 +13,9 @@ struct PushReducer {
             return .none
         case let .navigate(model):
             state.navigationScope = model
-            return .run({ send in
-                send(.removeLoading)
-            })
+            return .run { send in
+                send(.removeLoading, nil)
+            }
         case .removeLoading:
             state.uiState.isLoading = false
             return .none
@@ -23,7 +23,7 @@ struct PushReducer {
             state.uiState.isLoading = true
             return .run({ send in
                 try? await Task.sleep(for: .seconds(3))
-                send(.navigate(model))
+                send(.navigate(model), nil)
             })
         }
     }

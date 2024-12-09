@@ -51,9 +51,10 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// Sends an action to the presenter, updating the state and potentially executing a side effect.
     ///
     /// - Parameter action: The action to process through the reducer.
-    func send(_ action: State.Action) {
+    func send(_ action: State.Action, _ transaction: Transaction? = nil) {
         // Handle the effect produced by the reducer.
-        switch reducer(&state, action)  {
+        let effect: Effect<State.Action> = withTransaction(transaction ?? .init()) { reducer(&state, action) }
+        switch effect {
         case .none:
             break
         case let .run(asyncFunc, cancelId):
@@ -61,8 +62,8 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
                 cancellationCancellables.cancel(id: cancelId)
             }
             let task = Task {
-                await asyncFunc { [weak self] action in
-                    self?.send(action)
+                await asyncFunc { [weak self] action, transaction in
+                    self?.send(action, transaction)
                 }
             }
             let cancellable = AnyCancellable { task.cancel() }
@@ -85,9 +86,10 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// Sends an action to the presenter asynchronously, allowing the caller to await its completion.
     ///
     /// - Parameter action: The action to process through the reducer.
-    func send(_ action: State.Action) async {
+    func send(_ action: State.Action, _ transaction: Transaction? = nil) async {
         // Handle the effect produced by the reducer.
-        switch reducer(&state, action)  {
+        let effect: Effect<State.Action> = withTransaction(transaction ?? .init()) { reducer(&state, action) }
+        switch effect {
         case .none:
             break
         case let .run(asyncFunc, cancelId):
@@ -95,8 +97,8 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
                 cancellationCancellables.cancel(id: cancelId)
             }
             let task = Task {
-                await asyncFunc { [weak self] action in
-                    self?.send(action)
+                await asyncFunc { [weak self] action, transaction in
+                    self?.send(action, transaction)
                 }
             }
             // Execute the async effect within a cancellable task.
