@@ -21,6 +21,12 @@ struct PushDetail: View {
             VStack {
                 Text(presenter.state.uiState.modelId)
                 Button {
+                    presenter.send(.navigate(.init(id: "Nested Push")))
+                } label: {
+                    Text("Push Again")
+                }
+                .buttonStyle(.bordered)
+                Button {
                     presenter.send(.back)
                 } label: {
                     Text("Back")
@@ -28,6 +34,14 @@ struct PushDetail: View {
                 .buttonStyle(.bordered)
             }
             .padding()
+        }
+        .navigationDestination(item: presenter.binding(for: presenter.state.navigationScope, send: PushDetailState.Action.navigate)) { model in
+            PushDetailDetail(pushDetailDetailState: .init(
+                modelId: model.id,
+                back: { presenter.send(PushDetailState.Action.pop) },
+                backToBack: { presenter.send(PushDetailState.Action.popToParent) },
+                closeFlow: { presenter.send(PushDetailState.Action.closeFlow) }
+            ))
         }
     }
 }

@@ -8,22 +8,25 @@
 import Foundation
 import SwiftUI
 
-struct PushDetailState: PresenterState {
+struct PushDetailDetailState: PresenterState {
 
     struct UiState: Equatable {
         var modelId : String
     }
 
     enum Action: Sendable {
-        case back, navigate(PushDetailDetailModel?), pop, popToParent, closeFlow
+        case back, backToBack, closeFlow
     }
 
     var uiState: UiState
     var back: (() -> Void)
-    var navigationScope: PushDetailDetailModel? = nil
+    var backToBack: (() -> Void)
+    var closeFlow: (() -> Void)
 
-    init(modelId: String, back: @escaping () -> Void) {
+    init(modelId: String, back: @escaping () -> Void, backToBack: @escaping () -> Void, closeFlow: @escaping () -> Void) {
         self.uiState = .init(modelId: modelId)
         self.back = back
+        self.backToBack = backToBack
+        self.closeFlow = closeFlow
     }
 }
