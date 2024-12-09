@@ -11,7 +11,7 @@ import Foundation
 
 @MainActor
 /// A generic presenter that handles state and effects for a SwiftUI view using a reducer pattern.
-final class LBPresenter<State: PresenterState>: ObservableObject {
+final class LBPresenter<State: Actionnable>: ObservableObject {
 
     /// Type alias for the reducer function that handles state transitions and produces side effects.
     typealias Reducer = @MainActor (_ state: inout State, _ action: State.Action) -> Effect<State.Action>
@@ -120,6 +120,18 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     }
 }
 
+extension LBPresenter {
+    func binding<Value: BidirectionalCollection>(for value: Value, send action: @escaping (Value.Element) -> State.Action) -> Binding<Value> where Value.Element: Hashable {
+        Binding(
+            get: { value },
+            set: { [weak self] newValue, _ in
+                guard let newDestination = newValue.last else { return }
+                self?.send(action(newDestination))
+            }
+        )
+    }
+}
+
 private extension LBPresenter {
     /// Updates the state if it's different from the current state.
     /// Avoids triggering `objectWillChange` unnecessarily.
@@ -131,7 +143,7 @@ private extension LBPresenter {
     }
 }
 
-private extension PresenterState {
+private extension Actionnable {
     /// Compares two states for equality.
     ///
     /// - Parameter rhs: The other state to compare to.

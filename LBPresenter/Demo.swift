@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct Demo: View {
-    
+    @State private var showPushSheet = false
+
     var body: some View {
         NavigationStack {
             Form {
@@ -22,7 +23,10 @@ struct Demo: View {
                     NavigationLink("SideEffects") {
                         SideEffect()
                     }
-                    NavigationLink("Push") {
+                    Button("Push") {
+                        showPushSheet.toggle()
+                    }
+                    .sheet(isPresented: $showPushSheet) {
                         Push()
                     }
                     NavigationLink("Present") {
