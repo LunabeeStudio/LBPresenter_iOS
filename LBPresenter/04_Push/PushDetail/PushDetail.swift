@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PushDetail: View {
     @StateObject private var presenter: LBPresenter<PushDetailState, Never>
-//    @EnvironmentObject private var flow: LBPresenter<PushFlowState>
+    @Environment(\.sendWrapper) private var sendWrapper
 
     init(pushDetailState: PushDetailState) {
         self._presenter = StateObject(wrappedValue: .init(initialState: pushDetailState, reducer: PushDetailReducer.reducer))
@@ -21,21 +21,21 @@ struct PushDetail: View {
             VStack {
                 Text(presenter.state.uiState.modelId)
                 Button {
-//                    flow.send(.pop)
+                    sendWrapper?.send(PushFlowState.Action.pop)
                 } label: {
                     Text("Back")
                 }
                 .buttonStyle(.bordered)
 
                 Button {
-//                    flow.send(.navigate(.detail(.init(id: "mi-push mi-scorpion et re mi-push derrière"))))
+                    sendWrapper?.send(PushFlowState.Action.navigate(.detail(.init(id: "mi-push mi-scorpion et re mi-push derrière"))))
                 } label: {
                     Text("push")
                 }
                 .buttonStyle(.bordered)
 
                 Button {
-//                    flow.send(.popToRoot)
+                    sendWrapper?.send(PushFlowState.Action.popToRoot)
                 } label: {
                     Text("popToRoot")
                 }

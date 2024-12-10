@@ -142,11 +142,31 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
         )
     }
 
-    func binding<Value: BidirectionalCollection>(for value: Value, send action: @escaping (Value.Element) -> NavState.Action) -> Binding<Value> where Value.Element: Hashable {
+    /// Creates a SwiftUI `Binding` that observes and updates a bidirectional collection
+    /// while sending an action whenever the collection's last element changes.
+    ///
+    /// - Parameters:
+    ///   - value: The current value of the collection to bind to. Must conform to `BidirectionalCollection`.
+    ///   - action: A closure that takes the last element of the collection as input
+    ///             and returns an action of type `NavState.Action`.
+    ///
+    /// - Returns: A `Binding` for the given collection that updates its value and triggers an action when its last element changes.
+    ///
+    /// - Note:
+    ///   This binding only reacts to changes in the last element of the collection.
+    ///   The `action` is triggered only when the collection's `last` property is updated.
+    func binding<Value: BidirectionalCollection>(
+        for value: Value,
+        send action: @escaping (Value.Element) -> NavState.Action
+    ) -> Binding<Value> where Value.Element: Hashable {
         Binding(
+            // The getter for the binding returns the current value of the collection.
             get: { value },
+            // The setter for the binding updates the collection and triggers the `action` for the last element.
             set: { [weak self] newValue, _ in
+                // Safely unwrap the last element of the new collection.
                 if let lastElement = newValue.last {
+                    // Send the action associated with the last element to the `NavState`.
                     self?.send(action(lastElement))
                 }
             }
@@ -154,9 +174,23 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
     }
 }
 
+// Extension to ObservableObjectPublisher to add a helper method for conditional publishing
 private extension ObservableObjectPublisher {
+    /// Sends an update to notify subscribers of changes only if the new value is different from the old value.
+    ///
+    /// - Parameters:
+    ///   - newValue: The new value of a type conforming to the `Actionnable` protocol.
+    ///   - oldValue: The previous value of the same type.
+    ///
+    /// This method uses the `isEqual(to:)` method from the `Actionnable` protocol to compare the old and new values.
+    /// If they are equal, no notification is sent to avoid unnecessary updates. Otherwise, it triggers a change notification.
     func send<T: Actionnable>(with newValue: T, oldValue: T) {
-        if oldValue.isEqual(to: newValue) { return }
+        // Check if the old and new values are equal using the `isEqual(to:)` method.
+        if oldValue.isEqual(to: newValue) {
+            // If the values are equal, no changes have occurred, so exit without sending a notification.
+            return
+        }
+        // If the values are different, notify all subscribers of the change.
         send()
     }
 }
@@ -188,24 +222,87 @@ private extension Equatable {
     }
 }
 
+// Extension to the View protocol to add custom task and refreshable modifiers
 extension View {
+    /// Attaches an asynchronous task to the view that sends an action to the presenter.
+    ///
+    /// This task is triggered when the view appears. It's a specialized version of the `.task` modifier,
+    /// designed for use with an `LBPresenter` that manages state and navigation actions.
+    ///
+    /// - Parameters:
+    ///   - presenter: The `LBPresenter` responsible for managing the state and sending actions.
+    ///   - action: The action of type `State.Action` to send to the presenter when the task executes.
+    /// - Returns: A view with the task attached.
     func task<State: PresenterState, NavState: Actionnable>(
         _ presenter: LBPresenter<State, NavState>,
-        action: State.Action) -> some View where State.Action: Sendable {
+        action: State.Action
+    ) -> some View where State.Action: Sendable {
+        // The `.task` modifier allows asynchronous code to run when the view appears.
         self.task {
             await presenter.send(action)
         }
     }
 
-    func refreshable<State: PresenterState,  NavState: Actionnable>(
+    /// Adds a pull-to-refresh interaction to the view that sends an action to the presenter.
+    ///
+    /// This modifier is triggered when the user performs a "pull-to-refresh" gesture.
+    /// It's a specialized version of the `.refreshable` modifier, tailored for use with an `LBPresenter`.
+    ///
+    /// - Parameters:
+    ///   - presenter: The `LBPresenter` responsible for managing the state and sending actions.
+    ///   - action: The action of type `State.Action` to send to the presenter when the refresh is triggered.
+    /// - Returns: A view with the refreshable behavior attached.
+    func refreshable<State: PresenterState, NavState: Actionnable>(
         _ presenter: LBPresenter<State, NavState>,
-        action: State.Action) -> some View where State.Action: Sendable {
+        action: State.Action
+    ) -> some View where State.Action: Sendable {
+        // The `.refreshable` modifier handles the pull-to-refresh gesture and executes asynchronous code.
         self.refreshable {
             await presenter.send(action)
         }
     }
 }
 
+// Extension to make the `Never` type conform to the `Actionnable` protocol.
 extension Never: Actionnable {
+    /// The `Action` associated type for `Never` is also `Never`,
+    /// since `Never` represents a type that cannot have any instances.
+    ///
+    /// This is useful for cases where no navigation actions are needed.
     typealias Action = Never
+}
+
+struct SendFunctionWrapper: Sendable {
+    private let _send: @MainActor (Any) -> Void
+
+    init<Action>(send: @escaping @MainActor (Action) -> Void) {
+        self._send = { anyValue in
+            guard let value = anyValue as? Action else {
+                assertionFailure("Type mismatch: Expected \(Action.self), got \(type(of: anyValue))")
+                return
+            }
+            send(value)
+        }
+    }
+
+    @MainActor func send<Action>(_ value: Action) {
+        _send(value)
+    }
+}
+
+struct SendEnvironmentKey: EnvironmentKey {
+    static let defaultValue: SendFunctionWrapper? = nil
+}
+
+extension EnvironmentValues {
+    var sendWrapper: SendFunctionWrapper? {
+        get { self[SendEnvironmentKey.self] }
+        set { self[SendEnvironmentKey.self] = newValue }
+    }
+}
+
+extension View {
+    func setSend<Action: Sendable>(_ send: @escaping @MainActor (Action) -> Void) -> some View {
+        self.environment(\.sendWrapper, SendFunctionWrapper(send: send))
+    }
 }
