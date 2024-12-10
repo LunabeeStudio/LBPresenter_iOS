@@ -10,13 +10,13 @@ import Foundation
 struct FormReducer {
     private enum CancelID { case bouncing }
 
-    static let reducer: LBPresenter<FormState>.Reducer = { state, action in
+    static let reducer: LBPresenter<FormState, Never>.Reducer = { state, action in
         switch action {
         case .nameChanged(let name):
             if name != state.uiState.formData.name {
                 state.uiState.formData.name = name
                 state.uiState.formData.errorName = ""
-                return .run({ send in
+                return .run({ send, _ in
                     send(.bounce(.bouncing), nil)
                     do {
                         try await Task.sleep(for: .seconds(3))

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RefreshableAndCancellable: View {
-    @StateObject private var presenter: LBPresenter<RefreshableAndCancellableState> = .init(initialState: .init(uiState: .data), reducer: RefreshableAndCancellableReducer.reducer)
+    @StateObject private var presenter: LBPresenter<RefreshableAndCancellableState, Never> = .init(initialState: .init(uiState: .data), reducer: RefreshableAndCancellableReducer.reducer)
 
     var body: some View {
         let _ = Self._printChanges()

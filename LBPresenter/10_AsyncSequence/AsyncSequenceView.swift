@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AsyncSequenceView: View {
-    @StateObject private var presenter: LBPresenter<AsyncSequenceState> = .init(initialState: .init(state: .loading), initialActions: [.startEmitter], reducer: AsyncSequenceReducer.reducer)
+    @StateObject private var presenter: LBPresenter<AsyncSequenceState, Never> = .init(initialState: .init(state: .loading), initialActions: [.startEmitter], reducer: AsyncSequenceReducer.reducer)
 
     var body: some View {
         content

@@ -9,10 +9,10 @@ struct RefreshableAndCancellableReducer {
 
     private enum CancelID { case refreshable }
 
-    static let reducer: LBPresenter<RefreshableAndCancellableState>.Reducer = { state, action in
+    static let reducer: LBPresenter<RefreshableAndCancellableState, Never>.Reducer = { state, action in
         switch action {
         case .refreshData:
-            return .run({ send in
+            return .run({ send, _ in
                 do {
                     try await Task.sleep(for: .seconds(3))
                 } catch is CancellationError {

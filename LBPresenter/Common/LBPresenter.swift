@@ -5,28 +5,33 @@
 //  Created by Q2 on 03/12/2024.
 //
 
-@preconcurrency import Combine
+import Combine
 import SwiftUI
 import Foundation
 
 @MainActor
 /// A generic presenter that handles state and effects for a SwiftUI view using a reducer pattern.
-final class LBPresenter<State: Actionnable>: ObservableObject {
-
+class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
     /// Type alias for the reducer function that handles state transitions and produces side effects.
-    typealias Reducer = @MainActor (_ state: inout State, _ action: State.Action) -> Effect<State.Action>
+    typealias Reducer = @MainActor (_ state: inout State, _ action: State.Action) -> Effect<State.Action, NavState.Action>
+    typealias NavReducer = @MainActor (_ navState: inout NavState, _ action: NavState.Action) -> Void
 
     /// The current state of the presenter, published to notify SwiftUI views of any changes.
     /// The state is `private(set)` to restrict modifications to the presenter logic only.
     private(set) var state: State {
-        willSet { updateState(newValue) }
+        willSet { objectWillChange.send(with: newValue, oldValue: state) }
+    }
+
+    private(set) var navState: NavState! {
+        willSet { objectWillChange.send(with: newValue, oldValue: navState) }
     }
 
     /// The reducer function used to compute the next state and potential side effects based on an action.
-    private let reducer: Reducer
+    let reducer: Reducer
+    let navReducer: NavReducer!
 
     /// A reference to the currently running effect tasks, used to manage cancellable async operations.
-    private let cancellationCancellables = CancellablesCollection()
+    let cancellationCancellables: CancellablesCollection = .init()
 
     /// Initializes the presenter with an initial state, a list of initial actions to process, and a reducer function.
     ///
@@ -45,6 +50,16 @@ final class LBPresenter<State: Actionnable>: ObservableObject {
     init(initialState: State, initialActions: [State.Action]? = nil, reducer: @escaping Reducer) {
         state = initialState
         self.reducer = reducer
+        self.navState = nil
+        self.navReducer = nil
+        initialActions?.forEach { send($0) }
+    }
+
+    init(initialState: State, initialActions: [State.Action]? = nil, reducer: @escaping Reducer, navState: NavState, navReducer: @escaping NavReducer) {
+        self.state = initialState
+        self.reducer = reducer
+        self.navState = navState
+        self.navReducer = navReducer
         initialActions?.forEach { send($0) }
     }
 
@@ -53,7 +68,7 @@ final class LBPresenter<State: Actionnable>: ObservableObject {
     /// - Parameter action: The action to process through the reducer.
     func send(_ action: State.Action, _ transaction: Transaction? = nil) {
         // Handle the effect produced by the reducer.
-        let effect: Effect<State.Action> = withTransaction(transaction ?? .init()) { reducer(&state, action) }
+        let effect: Effect<State.Action, NavState.Action> = withTransaction(transaction ?? .init()) { reducer(&state, action) }
         switch effect {
         case .none:
             break
@@ -62,6 +77,8 @@ final class LBPresenter<State: Actionnable>: ObservableObject {
             let task: Task<Void, Never> = Task {
                 await asyncFunc { [weak self] action, transaction in
                     self?.send(action, transaction)
+                } _: { [weak self] action in
+                    self?.send(action)
                 }
             }
             let cancellable = AnyCancellable { task.cancel() }
@@ -77,12 +94,16 @@ final class LBPresenter<State: Actionnable>: ObservableObject {
         }
     }
 
+    func send(_ action: NavState.Action) {
+        navReducer(&navState, action)
+    }
+
     /// Sends an action to the presenter asynchronously, allowing the caller to await its completion.
     ///
     /// - Parameter action: The action to process through the reducer.
     fileprivate func send(_ action: State.Action, _ transaction: Transaction? = nil) async {
         // Handle the effect produced by the reducer.
-        let effect: Effect<State.Action> = withTransaction(transaction ?? .init()) { reducer(&state, action) }
+        let effect: Effect<State.Action, NavState.Action> = withTransaction(transaction ?? .init()) { reducer(&state, action) }
         switch effect {
         case .none:
             break
@@ -91,6 +112,8 @@ final class LBPresenter<State: Actionnable>: ObservableObject {
             let task: Task<Void, Never> = Task {
                 await asyncFunc { [weak self] action, transaction in
                     self?.send(action, transaction)
+                } _: { [weak self] action in
+                    self?.send(action)
                 }
             }
             let cancellable = AnyCancellable { task.cancel() }
@@ -118,28 +141,23 @@ final class LBPresenter<State: Actionnable>: ObservableObject {
             }
         )
     }
-}
 
-extension LBPresenter {
-    func binding<Value: BidirectionalCollection>(for value: Value, send action: @escaping (Value.Element) -> State.Action) -> Binding<Value> where Value.Element: Hashable {
+    func binding<Value: BidirectionalCollection>(for value: Value, send action: @escaping (Value.Element) -> NavState.Action) -> Binding<Value> where Value.Element: Hashable {
         Binding(
             get: { value },
             set: { [weak self] newValue, _ in
-                guard let newDestination = newValue.last else { return }
-                self?.send(action(newDestination))
+                if let lastElement = newValue.last {
+                    self?.send(action(lastElement))
+                }
             }
         )
     }
 }
 
-private extension LBPresenter {
-    /// Updates the state if it's different from the current state.
-    /// Avoids triggering `objectWillChange` unnecessarily.
-    ///
-    /// - Parameter newValue: The new state to update to.
-    func updateState(_ newValue: State) {
-        if state.isEqual(to: newValue) { return }
-        objectWillChange.send()
+private extension ObservableObjectPublisher {
+    func send<T: Actionnable>(with newValue: T, oldValue: T) {
+        if oldValue.isEqual(to: newValue) { return }
+        send()
     }
 }
 
@@ -171,19 +189,23 @@ private extension Equatable {
 }
 
 extension View {
-    func task<State: PresenterState>(
-        _ presenter: LBPresenter<State>,
+    func task<State: PresenterState, NavState: Actionnable>(
+        _ presenter: LBPresenter<State, NavState>,
         action: State.Action) -> some View where State.Action: Sendable {
         self.task {
             await presenter.send(action)
         }
     }
 
-    func refreshable<State: PresenterState>(
-        _ presenter: LBPresenter<State>,
+    func refreshable<State: PresenterState,  NavState: Actionnable>(
+        _ presenter: LBPresenter<State, NavState>,
         action: State.Action) -> some View where State.Action: Sendable {
         self.refreshable {
             await presenter.send(action)
         }
     }
+}
+
+extension Never: Actionnable {
+    typealias Action = Never
 }

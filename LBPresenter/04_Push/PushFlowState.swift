@@ -19,9 +19,9 @@ struct PushFlowState: FlowPresenterState, Equatable {
         case detail(PushDetailModel)
     }
 
-    var path: [Destination]
+    var path: Path
 
-    init(path: [Destination] = []) {
+    init(path: Path = []) {
         self.path = path
     }
 }

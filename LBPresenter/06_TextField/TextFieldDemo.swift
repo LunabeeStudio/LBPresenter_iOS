@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TextFieldDemo: View {
-    @StateObject private var presenter: LBPresenter<TextFieldState> = .init(initialState: .init(uiState: .data(TextFieldState.FormData(name: ""))), reducer: TextFieldReducer.reducer)
+    @StateObject private var presenter: LBPresenter<TextFieldState, Never> = .init(initialState: .init(uiState: .data(TextFieldState.FormData(name: ""))), reducer: TextFieldReducer.reducer)
 
     var body: some View {
         let _ = Self._printChanges()

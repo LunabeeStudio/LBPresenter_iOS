@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SideEffect: View {
-    @StateObject private var presenter: LBPresenter<SideEffectState> = .init(initialState: .init(uiState: .data), reducer: SideEffectReducer.reducer)
+    @StateObject private var presenter: LBPresenter<SideEffectState, Never> = .init(initialState: .init(uiState: .data), reducer: SideEffectReducer.reducer)
 
     var body: some View {
         let _ = Self._printChanges()

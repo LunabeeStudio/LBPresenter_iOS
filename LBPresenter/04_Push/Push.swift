@@ -8,18 +8,17 @@
 import SwiftUI
 
 struct Push: View {
-    @StateObject private var presenter: LBPresenter<PushState> = .init(initialState: .init(uiState: .init(isLoading: false)), reducer: PushReducer.reducer)
-    @StateObject private var flow: LBPresenter<PushFlowState> = .init(initialState: .init(), reducer: PushFlowReducer.reducer)
+    @StateObject private var presenter: LBPresenter<PushState, PushFlowState> = .init(initialState: .init(uiState: .init(isLoading: false)), reducer: PushReducer.reducer, navState: .init(), navReducer: PushReducer.navReducer)
 
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         let _ = Self._printChanges()
-        NavigationStack(path: flow.binding(for: flow.state.path, send: PushFlowState.Action.navigate)) {
+        NavigationStack(path: presenter.binding(for: presenter.navState.path, send: PushFlowState.Action.navigate)) {
             List {
                 VStack {
                     Button {
-                        flow.send(.navigate(.detail(.init(id: "pushed"))))
+                        presenter.send(.navigate(.detail(.init(id: "pushed"))))
                     } label: {
                         Text("push detail")
                     }
@@ -51,9 +50,7 @@ struct Push: View {
                 switch destination {
                 case let .detail(model):
                     PushDetail(pushDetailState: .init(modelId: model.id))
-                        .environmentObject(flow)
                 }
-
             }
         }
     }
