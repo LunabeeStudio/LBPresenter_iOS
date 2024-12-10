@@ -24,11 +24,11 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
 
     private(set) var navState: NavState! {
         willSet { objectWillChange.send(with: newValue, oldValue: navState) }
-    }
+    } // force unwrapped to force instantiation when needed
 
     /// The reducer function used to compute the next state and potential side effects based on an action.
     let reducer: Reducer
-    let navReducer: NavReducer!
+    let navReducer: NavReducer! // force unwrapped to force instantiation when needed
 
     /// A reference to the currently running effect tasks, used to manage cancellable async operations.
     let cancellationCancellables: CancellablesCollection = .init()
@@ -272,11 +272,19 @@ extension Never: Actionnable {
     typealias Action = Never
 }
 
+/// A wrapper for a generic `send` function to safely handle type-erased actions.
+/// This wrapper is `Sendable` to ensure thread-safety in Swift's concurrency model.
 struct SendFunctionWrapper: Sendable {
+    // A private closure that handles sending type-erased actions.
+    // It accepts `Any` and validates the type before forwarding it.
     private let _send: @MainActor (Any) -> Void
 
+    /// Initializes the wrapper with a strongly-typed `send` function.
+    /// The closure is type-erased to handle any input conforming to the expected action type.
+    /// - Parameter send: A closure to process actions of a specific type.
     init<Action>(send: @escaping @MainActor (Action) -> Void) {
         self._send = { anyValue in
+            // Ensure the value is of the expected `Action` type before sending.
             guard let value = anyValue as? Action else {
                 assertionFailure("Type mismatch: Expected \(Action.self), got \(type(of: anyValue))")
                 return
@@ -285,24 +293,34 @@ struct SendFunctionWrapper: Sendable {
         }
     }
 
+    /// Sends an action of a specific type to the underlying closure.
+    /// - Parameter value: The action to send.
     @MainActor func send<Action>(_ value: Action) {
         _send(value)
     }
 }
 
-struct SendEnvironmentKey: EnvironmentKey {
+/// A private environment key for storing the `SendFunctionWrapper`.
+/// This key allows the wrapper to be passed through SwiftUI's environment.
+private struct SendEnvironmentKey: EnvironmentKey {
+    // The default value for the environment key is `nil` because no wrapper exists initially.
     static let defaultValue: SendFunctionWrapper? = nil
 }
 
 extension EnvironmentValues {
-    var sendWrapper: SendFunctionWrapper? {
+    /// A computed property to access or set the `SendFunctionWrapper` in the environment.
+    var navigationContext: SendFunctionWrapper? {
         get { self[SendEnvironmentKey.self] }
         set { self[SendEnvironmentKey.self] = newValue }
     }
 }
 
 extension View {
-    func setSend<Action: Sendable>(_ send: @escaping @MainActor (Action) -> Void) -> some View {
-        self.environment(\.sendWrapper, SendFunctionWrapper(send: send))
+    /// Sets up the navigation context in the SwiftUI environment.
+    /// This allows child views to access the `SendFunctionWrapper` for navigation actions.
+    /// - Parameter presenter: The presenter providing the `send` function to handle navigation actions.
+    /// - Returns: A view modified with the navigation context environment value.
+    func setNavigationContext<State, NavState>(with presenter: LBPresenter<State, NavState>) -> some View {
+        self.environment(\.navigationContext, SendFunctionWrapper(send: presenter.send(_:)))
     }
 }

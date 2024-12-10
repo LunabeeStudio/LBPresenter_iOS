@@ -50,7 +50,7 @@ struct Push: View {
                 switch destination {
                 case let .detail(model):
                     PushDetail(pushDetailState: .init(modelId: model.id))
-                        .setSend(presenter.send(_:))
+                        .setNavigationContext(with: presenter)
                 }
             }
         }
