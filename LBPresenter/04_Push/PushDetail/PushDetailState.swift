@@ -14,15 +14,11 @@ struct PushDetailState: PresenterState {
         var modelId : String
     }
 
-    enum Action: Sendable {
-        case back
-    }
+    enum Action: Sendable { }
 
     var uiState: UiState
-    var back: (() -> Void)
 
-    init(modelId: String, back: @escaping () -> Void) {
+    init(modelId: String) {
         self.uiState = .init(modelId: modelId)
-        self.back = back
     }
 }

@@ -6,7 +6,7 @@
 //
 
 struct ActionReducer {
-    static let reducer: LBPresenter<ActionState>.Reducer = { state, action in
+    static let reducer: LBPresenter<ActionState, Never>.Reducer = { state, action in
         switch action {
         case .increment:
             state.uiState.count += 1

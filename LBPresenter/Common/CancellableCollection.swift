@@ -28,8 +28,9 @@ public final class CancellablesCollection {
     ///   - id: A unique identifier for grouping cancellables.
     public func insert(
         _ cancellable: AnyCancellable,
-        at id: AnyHashable
+        at id: AnyHashable?
     ) {
+        guard let id else { return }
         lock.lock()
         defer { lock.unlock() }
         self.storage[id, default: []].insert(cancellable)
@@ -42,8 +43,9 @@ public final class CancellablesCollection {
     ///   - id: The identifier where the cancellable is stored.
     public func remove(
         _ cancellable: AnyCancellable,
-        at id: AnyHashable
+        at id: AnyHashable?
     ) {
+        guard let id else { return }
         lock.lock()
         defer { lock.unlock() }
         self.storage[id]?.remove(cancellable)
@@ -56,8 +58,9 @@ public final class CancellablesCollection {
     ///
     /// - Parameter id: The identifier whose cancellables should be canceled.
     public func cancel(
-        id: AnyHashable
+        id: AnyHashable?
     ) {
+        guard let id else { return }
         lock.lock()
         defer { lock.unlock() }
         self.storage[id]?.forEach { $0.cancel() }

@@ -6,11 +6,7 @@
 //
 
 struct PushDetailReducer {
-    static let reducer: LBPresenter<PushDetailState>.Reducer = { state, action in
-        switch action {
-        case .back:
-            state.back()
-            return .none
-        }
+    static let reducer: LBPresenter<PushDetailState, Never>.Reducer = { state, action in
+        switch action {}
     }
 }
