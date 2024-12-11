@@ -157,18 +157,17 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
     ///   The `action` is triggered only when the collection's `last` property is updated.
     func binding<Value: BidirectionalCollection>(
         for value: Value,
-        send action: @escaping (Value.Element) -> NavState.Action
+        send action: @escaping (Value.Element?) -> NavState.Action
     ) -> Binding<Value> where Value.Element: Hashable {
         Binding(
             // The getter for the binding returns the current value of the collection.
             get: { value },
             // The setter for the binding updates the collection and triggers the `action` for the last element.
             set: { [weak self] newValue, _ in
-                // Safely unwrap the last element of the new collection.
-                if let lastElement = newValue.last {
-                    // Send the action associated with the last element to the `NavState`.
-                    self?.send(action(lastElement))
-                }
+                // Send the action associated with the last element to the `NavState`.
+                var destination: Value.Element? = newValue.last
+                if newValue.count < value.count { destination = nil } // pop
+                self?.send(action(destination))
             }
         )
     }
@@ -274,15 +273,17 @@ extension Never: Actionnable {
 
 /// A wrapper for a generic `send` function to safely handle type-erased actions.
 /// This wrapper is `Sendable` to ensure thread-safety in Swift's concurrency model.
-struct SendFunctionWrapper: Sendable {
+struct NavigationContextWrapper: Sendable {
     // A private closure that handles sending type-erased actions.
     // It accepts `Any` and validates the type before forwarding it.
     private let _send: @MainActor (Any) -> Void
+    private let _context: any KeyPathAccessible
 
     /// Initializes the wrapper with a strongly-typed `send` function.
     /// The closure is type-erased to handle any input conforming to the expected action type.
     /// - Parameter send: A closure to process actions of a specific type.
-    init<Action>(send: @escaping @MainActor (Action) -> Void) {
+    init<Action>(context: any KeyPathAccessible, send: @escaping @MainActor (Action) -> Void) {
+        self._context = context
         self._send = { anyValue in
             // Ensure the value is of the expected `Action` type before sending.
             guard let value = anyValue as? Action else {
@@ -298,20 +299,34 @@ struct SendFunctionWrapper: Sendable {
     @MainActor func send<Action>(_ value: Action) {
         _send(value)
     }
+
+    func get<T: KeyPathAccessible, V>(_ keyPath: KeyPath<T, V>) -> V? {
+        (_context as? T)?.get(keyPath)
+    }
+}
+
+protocol KeyPathAccessible: Sendable {
+    func get<V>(_ keyPath: KeyPath<Self, V>) -> V?
+}
+
+extension KeyPathAccessible {
+    func get<V>(_ keyPath: KeyPath<Self, V>) -> V? {
+        self[keyPath: keyPath]
+    }
 }
 
 /// A private environment key for storing the `SendFunctionWrapper`.
 /// This key allows the wrapper to be passed through SwiftUI's environment.
-private struct SendEnvironmentKey: EnvironmentKey {
+private struct NavigationContextEnvironmentKey: EnvironmentKey {
     // The default value for the environment key is `nil` because no wrapper exists initially.
-    static let defaultValue: SendFunctionWrapper? = nil
+    static let defaultValue: NavigationContextWrapper? = nil
 }
 
 extension EnvironmentValues {
     /// A computed property to access or set the `SendFunctionWrapper` in the environment.
-    var navigationContext: SendFunctionWrapper? {
-        get { self[SendEnvironmentKey.self] }
-        set { self[SendEnvironmentKey.self] = newValue }
+    var navigationContext: NavigationContextWrapper? {
+        get { self[NavigationContextEnvironmentKey.self] }
+        set { self[NavigationContextEnvironmentKey.self] = newValue }
     }
 }
 
@@ -320,7 +335,7 @@ extension View {
     /// This allows child views to access the `SendFunctionWrapper` for navigation actions.
     /// - Parameter presenter: The presenter providing the `send` function to handle navigation actions.
     /// - Returns: A view modified with the navigation context environment value.
-    func setNavigationContext<State, NavState>(with presenter: LBPresenter<State, NavState>) -> some View {
-        self.environment(\.navigationContext, SendFunctionWrapper(send: presenter.send(_:)))
+    func setNavigation<State, NavState, NavigationContext: KeyPathAccessible>(context: NavigationContext, with presenter: LBPresenter<State, NavState>) -> some View {
+        self.environment(\.navigationContext, NavigationContextWrapper(context: context, send: presenter.send(_:)))
     }
 }

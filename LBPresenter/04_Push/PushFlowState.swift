@@ -12,7 +12,7 @@ struct PushFlowState: FlowPresenterState, Equatable {
     typealias Path = [Destination]
     
     enum Action: Sendable, Equatable {
-        case navigate(Destination), pop, popToRoot
+        case navigate(Destination?), pop, popToRoot
     }
 
     enum Destination: Equatable, Hashable {

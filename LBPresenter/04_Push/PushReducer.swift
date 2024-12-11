@@ -25,7 +25,11 @@ struct PushReducer {
     static let navReducer: LBPresenter<PushState, PushFlowState>.NavReducer = { state, action in
         switch action {
         case let .navigate(model):
-            state.path.append(model)
+            if let model {
+                state.path.append(model)
+            } else {
+                state.path.removeLast()
+            }
         case .pop:
             state.path.removeLast()
         case .popToRoot:

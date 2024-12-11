@@ -5,6 +5,6 @@
 //  Created by Q2 on 05/12/2024.
 //
 
-struct PushDetailModel: Identifiable, Equatable, Hashable {
+struct PushDetailModel: KeyPathAccessible, Identifiable, Equatable, Hashable {
     let id: String
 }

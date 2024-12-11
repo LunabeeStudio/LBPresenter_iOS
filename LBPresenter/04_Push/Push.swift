@@ -49,8 +49,8 @@ struct Push: View {
             .navigationDestination(for: PushFlowState.Destination.self) { destination in
                 switch destination {
                 case let .detail(model):
-                    PushDetail(pushDetailState: .init(modelId: model.id))
-                        .setNavigationContext(with: presenter)
+                    PushDetail()
+                        .setNavigation(context: model, with: presenter)
                 }
             }
         }

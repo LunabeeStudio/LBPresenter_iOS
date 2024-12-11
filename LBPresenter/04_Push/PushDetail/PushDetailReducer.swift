@@ -7,6 +7,10 @@
 
 struct PushDetailReducer {
     static let reducer: LBPresenter<PushDetailState, Never>.Reducer = { state, action in
-        switch action {}
+        switch action {
+        case let .setInitialState(modelId: id):
+            state.uiState.modelId = id
+            return .none
+        }
     }
 }

@@ -9,16 +9,17 @@ import Foundation
 import SwiftUI
 
 struct PushDetailState: PresenterState {
-
     struct UiState: Equatable {
-        var modelId : String
+        var modelId : String?
     }
 
-    enum Action: Sendable { }
+    enum Action: Sendable {
+        case setInitialState(modelId: String?)
+    }
 
     var uiState: UiState
 
-    init(modelId: String) {
+    init(modelId: String? = nil) {
         self.uiState = .init(modelId: modelId)
     }
 }
