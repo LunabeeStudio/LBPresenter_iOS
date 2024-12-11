@@ -23,9 +23,7 @@ struct RefreshableAndCancellable: View {
             }
             .padding()
         }
-        .refreshable {
-            await presenter.send(.refreshData)
-        }
+        .refreshable(presenter, action: .refreshData)
     }
 }
 

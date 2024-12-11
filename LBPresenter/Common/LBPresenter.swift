@@ -26,7 +26,7 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     private let reducer: Reducer
 
     /// A reference to the currently running effect tasks, used to manage cancellable async operations.
-    private let cancellationCancellables = CancellablesCollection()
+    private let cancellationCancellables: CancellablesCollection = .init()
 
     /// Initializes the presenter with an initial state, a list of initial actions to process, and a reducer function.
     ///
@@ -51,30 +51,25 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// Sends an action to the presenter, updating the state and potentially executing a side effect.
     ///
     /// - Parameter action: The action to process through the reducer.
-    func send(_ action: State.Action) {
+    func send(_ action: State.Action, _ transaction: Transaction? = nil) {
         // Handle the effect produced by the reducer.
-        switch reducer(&state, action)  {
+        let effect: Effect<State.Action> = withTransaction(transaction ?? .init()) { reducer(&state, action) }
+        switch effect {
         case .none:
             break
         case let .run(asyncFunc, cancelId):
-            if let cancelId = cancelId {
-                cancellationCancellables.cancel(id: cancelId)
-            }
-            let task = Task {
-                await asyncFunc { [weak self] action in
-                    self?.send(action)
+            cancellationCancellables.cancel(id: cancelId)
+            let task: Task<Void, Never> = Task {
+                await asyncFunc { [weak self] action, transaction in
+                    self?.send(action, transaction)
                 }
             }
             let cancellable = AnyCancellable { task.cancel() }
-            if let cancelId = cancelId {
-                cancellationCancellables.insert(cancellable, at: cancelId)
-                Task {
-                    defer {
-                        cancellationCancellables.remove(cancellable, at: cancelId)
-                    }
-                    // Wait for the task to finish and clean up after completion
-                    _ = await task.result // Wait for the task to complete
-                }
+            cancellationCancellables.insert(cancellable, at: cancelId)
+            Task {
+                defer { cancellationCancellables.remove(cancellable, at: cancelId) }
+                // Wait for the task to finish and clean up after completion
+                _ = await task.result // Wait for the task to complete
             }
         case let .cancel(cancelId):
             // Cancel the running effect task with the corresponding id.
@@ -85,35 +80,30 @@ final class LBPresenter<State: PresenterState>: ObservableObject {
     /// Sends an action to the presenter asynchronously, allowing the caller to await its completion.
     ///
     /// - Parameter action: The action to process through the reducer.
-    func send(_ action: State.Action) async {
+    fileprivate func send(_ action: State.Action, _ transaction: Transaction? = nil) async {
         // Handle the effect produced by the reducer.
-        switch reducer(&state, action)  {
+        let effect: Effect<State.Action> = withTransaction(transaction ?? .init()) { reducer(&state, action) }
+        switch effect {
         case .none:
             break
         case let .run(asyncFunc, cancelId):
-            if let cancelId = cancelId {
-                cancellationCancellables.cancel(id: cancelId)
-            }
-            let task = Task {
-                await asyncFunc { [weak self] action in
-                    self?.send(action)
-                }
-            }
-            // Execute the async effect within a cancellable task.
+            let myCancelId: String = cancelId ?? UUID().uuidString
             await withTaskCancellationHandler {
-                let cancellable = AnyCancellable { task.cancel() }
-                if let cancelId = cancelId {
-                    cancellationCancellables.insert(cancellable, at: cancelId)
-                }
-                defer {
-                    if let cancelId = cancelId {
-                        cancellationCancellables.remove(cancellable, at: cancelId)
+                cancellationCancellables.cancel(id: myCancelId)
+                let task: Task<Void, Never> = Task {
+                    await asyncFunc { [weak self] action, transaction in
+                        self?.send(action, transaction)
                     }
                 }
-                await task.value
+                let cancellable = AnyCancellable { task.cancel() }
+                cancellationCancellables.insert(cancellable, at: myCancelId)
+                defer { cancellationCancellables.remove(cancellable, at: myCancelId) }
+                // Wait for the task to finish and clean up after completion
+                _ = await task.result // Wait for the task to complete
             } onCancel: {
-                // Cancel the currently running effect task.
-                task.cancel()
+                Task { @MainActor in
+                    cancellationCancellables.cancel(id: myCancelId)
+                }
             }
         case let .cancel(cancelId):
             // Cancel the running effect task with the corresponding id.
@@ -172,5 +162,23 @@ private extension Equatable {
     func isEqual(to rhs: Any) -> Bool {
         guard let rhs = rhs as? Self else { return false }
         return self == rhs
+    }
+}
+
+extension View {
+    func task<State: PresenterState>(
+        _ presenter: LBPresenter<State>,
+        action: State.Action) -> some View where State.Action: Sendable {
+        self.task {
+            await presenter.send(action)
+        }
+    }
+
+    func refreshable<State: PresenterState>(
+        _ presenter: LBPresenter<State>,
+        action: State.Action) -> some View where State.Action: Sendable {
+        self.refreshable {
+            await presenter.send(action)
+        }
     }
 }
