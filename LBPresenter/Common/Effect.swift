@@ -22,11 +22,11 @@ enum Effect<Action> {
     /// An asynchronous operation that can dispatch follow-up actions back to the presenter.
     ///
     /// - Parameter send: A closure to dispatch additional actions to the presenter during or after the operation.
-    case run((_ send: @escaping Send<Action>) async -> Void, cancelId: AnyHashable? = nil)
+    case run((_ send: @escaping Send<Action>) async -> Void, cancelId: String? = nil)
 
     /// Cancels the currently running effect, if any.
     ///
     /// This is useful to ensure that long-running or obsolete effects don't continue consuming resources
     /// or triggering unwanted updates.
-    case cancel(cancelId: AnyHashable)
+    case cancel(cancelId: String)
 }
