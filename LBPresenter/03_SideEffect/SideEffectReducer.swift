@@ -12,13 +12,13 @@ struct SideEffectReducer {
             state.uiState = .loading
             return .run { send, _ in
                 try? await Task.sleep(for: .seconds(1))
-                send(.showData, .init(animation: .easeInOut))
+                send(.showData, transaction: .init(animation: .easeInOut))
             }
         case .showLoadingThenError:
             state.uiState = .loading
             return .run { send, _ in
                 try? await Task.sleep(for: .seconds(1))
-                send(.showError, .init(animation: .easeInOut))
+                send(.showError, transaction: .init(animation: .easeInOut))
             }
         case .showData:
             state.uiState = .data

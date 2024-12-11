@@ -17,7 +17,7 @@ struct PushReducer {
             state.uiState.isLoading = true
             return .run { send, _ in
                 try? await Task.sleep(for: .seconds(2))
-                send(.removeLoading, nil)
+                send(.removeLoading)
             }
         }
     }

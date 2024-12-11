@@ -75,11 +75,11 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
         case let .run(asyncFunc, cancelId):
             cancellationCancellables.cancel(id: cancelId)
             let task: Task<Void, Never> = Task {
-                await asyncFunc { [weak self] action, transaction in
+                await asyncFunc(.init(send: { [weak self] action, transaction in
                     self?.send(action, transaction)
-                } _: { [weak self] action in
+                }), { [weak self] action in
                     self?.send(action)
-                }
+                })
             }
             let cancellable = AnyCancellable { task.cancel() }
             cancellationCancellables.insert(cancellable, at: cancelId)
@@ -112,11 +112,11 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
             await withTaskCancellationHandler {
                 cancellationCancellables.cancel(id: myCancelId)
                 let task: Task<Void, Never> = Task {
-                    await asyncFunc { [weak self] action, transaction in
+                    await asyncFunc(.init(send: { [weak self] action, transaction in
                         self?.send(action, transaction)
-                    } _: { [weak self] action in
+                    }), _: { [weak self] action in
                         self?.send(action)
-                    }
+                    })
                 }
                 let cancellable = AnyCancellable { task.cancel() }
                 cancellationCancellables.insert(cancellable, at: myCancelId)

@@ -17,7 +17,7 @@ struct AsyncSequenceReducer {
         case .startObserve:
             return .run { send, _ in
                 for await second in TimerEmitter.shared.sequence() {
-                    send(.didReceiveData(.now), .init(animation: .smooth))
+                    send(.didReceiveData(.now), transaction: .init(animation: .smooth))
                 }
             }
         case let .didReceiveData(date):

@@ -7,8 +7,34 @@
 
 import SwiftUI
 
-typealias Send<Action> = @Sendable @MainActor (_ action: Action, _ transaction: Transaction?) -> Void
 typealias SendNavigation<Action> = @Sendable @MainActor (_ action: Action) -> Void
+
+@MainActor
+public struct Send<Action>: Sendable {
+    let send: @MainActor @Sendable (Action,  Transaction?) -> Void
+
+    public init(send: @escaping @MainActor @Sendable (Action, Transaction?) -> Void) {
+        self.send = send
+    }
+
+    /// Sends an action back into the system from an effect.
+    ///
+    /// - Parameter action: An action.
+    public func callAsFunction(_ action: Action) {
+        guard !Task.isCancelled else { return }
+        self.send(action, nil)
+    }
+
+    /// Sends an action back into the system from an effect with transaction.
+    ///
+    /// - Parameters:
+    ///  - action: An action.
+    ///  - transaction: A transaction.
+    public func callAsFunction(_ action: Action, transaction: Transaction) {
+        guard !Task.isCancelled else { return }
+        self(action, transaction: transaction)
+    }
+}
 
 /// Represents the potential side effects that can be produced by a reducer in response to an action.
 ///
@@ -23,7 +49,7 @@ enum Effect<Action, NavigationAction> {
     /// An asynchronous operation that can dispatch follow-up actions back to the presenter.
     ///
     /// - Parameter send: A closure to dispatch additional actions to the presenter during or after the operation.
-    case run((_ send: @escaping Send<Action>, _ sendNavigation: @escaping SendNavigation<NavigationAction>) async -> Void, cancelId: String? = nil)
+    case run((_ send: Send<Action>, _ sendNavigation: @escaping SendNavigation<NavigationAction>) async -> Void, cancelId: String? = nil)
 
     /// Cancels the currently running effect, if any.
     ///

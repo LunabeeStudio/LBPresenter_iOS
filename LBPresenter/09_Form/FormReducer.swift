@@ -17,10 +17,10 @@ struct FormReducer {
                 state.uiState.formData.name = name
                 state.uiState.formData.errorName = ""
                 return .run({ send, _ in
-                    send(.bounce(.bouncing), nil)
+                    send(.bounce(.bouncing))
                     do {
                         try await Task.sleep(for: .seconds(3))
-                        send(.bounce(.done), nil)
+                        send(.bounce(.done))
                     } catch is CancellationError {
                         print("Task was cancelled")
                     } catch {
