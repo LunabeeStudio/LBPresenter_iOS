@@ -7,22 +7,24 @@
 
 struct RefreshableAndCancellableReducer {
 
-    private enum CancelID { case refreshable }
+    private enum CancelID: String { case refreshable }
 
     static let reducer: LBPresenter<RefreshableAndCancellableState, Never>.Reducer = { state, action in
         switch action {
         case .refreshData:
             return .run({ send, _ in
                 do {
+                    print("Task started")
                     try await Task.sleep(for: .seconds(3))
+                    print("Task completed")
                 } catch is CancellationError {
                     print("Task was cancelled")
                 } catch {
                     print("ooops! \(error)")
                 }
-            }, cancelId: CancelID.refreshable)
+            }, cancelId: CancelID.refreshable.rawValue)
         case .cancel:
-            return .cancel(cancelId: CancelID.refreshable)
+            return .cancel(cancelId: CancelID.refreshable.rawValue)
         }
     }
 }

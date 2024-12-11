@@ -14,7 +14,7 @@ public final class CancellablesCollection {
     // MARK: - Properties
 
     /// Storage for cancellables, grouped by their unique identifiers.
-    private var storage: [AnyHashable: Set<AnyCancellable>] = [:]
+    private var storage: [String: Set<AnyCancellable>] = [:]
 
     /// A lock to ensure thread-safe access to the storage.
     private let lock = NSLock()
@@ -28,7 +28,7 @@ public final class CancellablesCollection {
     ///   - id: A unique identifier for grouping cancellables.
     public func insert(
         _ cancellable: AnyCancellable,
-        at id: AnyHashable?
+        at id: String?
     ) {
         guard let id else { return }
         lock.lock()
@@ -43,7 +43,7 @@ public final class CancellablesCollection {
     ///   - id: The identifier where the cancellable is stored.
     public func remove(
         _ cancellable: AnyCancellable,
-        at id: AnyHashable?
+        at id: String?
     ) {
         guard let id else { return }
         lock.lock()
@@ -58,7 +58,7 @@ public final class CancellablesCollection {
     ///
     /// - Parameter id: The identifier whose cancellables should be canceled.
     public func cancel(
-        id: AnyHashable?
+        id: String?
     ) {
         guard let id else { return }
         lock.lock()

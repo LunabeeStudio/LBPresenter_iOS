@@ -21,6 +21,7 @@ struct AsyncSequenceReducer {
                 }
             }
         case let .didReceiveData(date):
+            print("did receive data")
             state.state = .data(date)
             return .none
         }

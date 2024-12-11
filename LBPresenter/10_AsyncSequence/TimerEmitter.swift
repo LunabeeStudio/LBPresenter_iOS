@@ -12,6 +12,7 @@ class TimerEmitter {
     private var timerSequence: AsyncTimerSequence?
 
     func startTimer() {
+        guard timerSequence == nil else { return }
         timerSequence = .init(interval: .seconds(1))
     }
 

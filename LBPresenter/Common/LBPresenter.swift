@@ -31,7 +31,7 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
     let navReducer: NavReducer! // force unwrapped to force instantiation when needed
 
     /// A reference to the currently running effect tasks, used to manage cancellable async operations.
-    let cancellationCancellables: CancellablesCollection = .init()
+    private let cancellationCancellables: CancellablesCollection = .init()
 
     /// Initializes the presenter with an initial state, a list of initial actions to process, and a reducer function.
     ///
@@ -108,19 +108,26 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
         case .none:
             break
         case let .run(asyncFunc, cancelId):
-            cancellationCancellables.cancel(id: cancelId)
-            let task: Task<Void, Never> = Task {
-                await asyncFunc { [weak self] action, transaction in
-                    self?.send(action, transaction)
-                } _: { [weak self] action in
-                    self?.send(action)
+            let myCancelId: String = cancelId ?? UUID().uuidString
+            await withTaskCancellationHandler {
+                cancellationCancellables.cancel(id: myCancelId)
+                let task: Task<Void, Never> = Task {
+                    await asyncFunc { [weak self] action, transaction in
+                        self?.send(action, transaction)
+                    } _: { [weak self] action in
+                        self?.send(action)
+                    }
+                }
+                let cancellable = AnyCancellable { task.cancel() }
+                cancellationCancellables.insert(cancellable, at: myCancelId)
+                defer { cancellationCancellables.remove(cancellable, at: myCancelId) }
+                // Wait for the task to finish and clean up after completion
+                _ = await task.result // Wait for the task to complete
+            } onCancel: {
+                Task { @MainActor in
+                    cancellationCancellables.cancel(id: myCancelId)
                 }
             }
-            let cancellable = AnyCancellable { task.cancel() }
-            cancellationCancellables.insert(cancellable, at: cancelId)
-            defer { cancellationCancellables.remove(cancellable, at: cancelId) }
-            // Wait for the task to finish and clean up after completion
-            _ = await task.result // Wait for the task to complete
         case let .cancel(cancelId):
             // Cancel the running effect task with the corresponding id.
             cancellationCancellables.cancel(id: cancelId)

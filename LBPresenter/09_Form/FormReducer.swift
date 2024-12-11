@@ -8,7 +8,7 @@
 import Foundation
 
 struct FormReducer {
-    private enum CancelID { case bouncing }
+    private enum CancelID: String { case bouncing }
 
     static let reducer: LBPresenter<FormState, Never>.Reducer = { state, action in
         switch action {
@@ -26,7 +26,7 @@ struct FormReducer {
                     } catch {
                         print("ooops! \(error)")
                     }
-                }, cancelId: CancelID.bouncing)
+                }, cancelId: CancelID.bouncing.rawValue)
             } else {
                 return .none
             }
