@@ -15,4 +15,34 @@ import Foundation
 protocol FlowPresenterState: Actionnable {
     associatedtype Path: Hashable
     associatedtype Destination
+
+    var path: Path { get set }
+}
+
+extension FlowPresenterState where Path == [Destination] {
+    mutating func navigate(to destination: Destination?) {
+        if let destination {
+            path.append(destination)
+        } else {
+            path.removeLast()
+        }
+    }
+
+    mutating func pop() {
+        path.removeLast()
+    }
+
+    mutating func popToRoot() {
+        path.removeAll()
+    }
+}
+
+extension FlowPresenterState where Path == Destination? {
+    mutating func navigate(to destination: Destination?) {
+        path = destination
+    }
+
+    mutating func pop() {
+        path = nil
+    }
 }
