@@ -14,7 +14,9 @@ struct RefreshableAndCancellableReducer {
         case .refreshData:
             return .run({ send in
                 do {
+                    print("Task started")
                     try await Task.sleep(for: .seconds(3))
+                    print("Task completed")
                 } catch is CancellationError {
                     print("Task was cancelled")
                 } catch {
