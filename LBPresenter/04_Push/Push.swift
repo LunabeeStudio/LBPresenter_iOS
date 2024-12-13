@@ -18,7 +18,7 @@ struct Push: View {
             List {
                 VStack {
                     Button {
-                        presenter.send(.navigate(.detail(.init(id: "pushed"))))
+                        presenter.send(.pushDetail)
                     } label: {
                         Text("push detail")
                     }

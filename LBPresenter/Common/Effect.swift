@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-typealias SendNavigation<Action> = @Sendable @MainActor (_ action: Action) -> Void
-
 /// Represents the potential side effects that can be produced by a reducer in response to an action.
 ///
 /// - `none`: No side effect will be executed.
@@ -22,7 +20,7 @@ enum Effect<Action, NavigationAction> {
     /// An asynchronous operation that can dispatch follow-up actions back to the presenter.
     ///
     /// - Parameter send: A closure to dispatch additional actions to the presenter during or after the operation.
-    case run((_ send: Send<Action>, _ sendNavigation: @escaping SendNavigation<NavigationAction>) async -> Void, cancelId: String? = nil)
+    case run(@MainActor (_ send: Send<Action>, _ sendNavigation: Send<NavigationAction>) async -> Void, cancelId: String? = nil)
 
     /// Cancels the currently running effect, if any.
     ///

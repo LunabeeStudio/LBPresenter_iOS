@@ -86,16 +86,20 @@ final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>: LBPre
             break
         case let .run(asyncFunc, cancelId):
             cancellationCancellables.cancel(id: cancelId)
-            let task: Task<Void, Never> = Task {
+            let task: Task<Void, Never> = Task { @MainActor in
                 await asyncFunc(.init(send: { [weak self] action, transaction in
-                    self?.send(action, transaction)
-                }), { [weak self] action in
-                    self?.send(action)
-                })
+                    Task { @MainActor in
+                        self?.send(action, transaction)
+                    }
+                }), .init(send: { [weak self] action, _ in
+                    Task { @MainActor in
+                        self?.send(navAction: action)
+                    }
+                }))
             }
             let cancellable: AnyCancellable = .init { task.cancel() }
             cancellationCancellables.insert(cancellable, at: cancelId)
-            Task {
+            Task { @MainActor in
                 defer { cancellationCancellables.remove(cancellable, at: cancelId) }
                 // Wait for the task to finish and clean up after completion
                 _ = await task.result // Wait for the task to complete
@@ -106,8 +110,8 @@ final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>: LBPre
         }
     }
 
-    func send(_ action: NavState.Action) {
-        navReducer(&navState, action)
+    private func send(navAction: NavState.Action) {
+        navReducer(&navState, navAction)
     }
 
     /// Sends an action to the presenter asynchronously, allowing the caller to await its completion.
@@ -125,10 +129,14 @@ final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>: LBPre
                 cancellationCancellables.cancel(id: myCancelId)
                 let task: Task<Void, Never> = Task {
                     await asyncFunc(.init(send: { [weak self] action, transaction in
-                        self?.send(action, transaction)
-                    }), _: { [weak self] action in
-                        self?.send(action)
-                    })
+                        Task { @MainActor in
+                            self?.send(action, transaction)
+                        }
+                    }), .init(send: { [weak self] action, _ in
+                        Task { @MainActor in
+                            self?.send(navAction: action)
+                        }
+                    }))
                 }
                 let cancellable: AnyCancellable = .init { task.cancel() }
                 cancellationCancellables.insert(cancellable, at: myCancelId)
@@ -186,7 +194,7 @@ extension LBPresenter where NavState.Path == [NavState.Destination] {
                 // Send the action associated with the last element to the `NavState`.
                 var destination: NavState.Path.Element? = newValue.last
                 if newValue.count < navState.path.count { destination = nil } // pop
-                self.send(action(destination))
+                self.send(navAction: action(destination))
             }
         )
     }

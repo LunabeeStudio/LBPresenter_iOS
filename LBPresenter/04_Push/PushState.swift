@@ -14,7 +14,7 @@ struct PushState: PresenterState, Equatable {
     }
 
     enum Action: Sendable, Equatable {
-        case delayNavigate(PushDetailModel), removeLoading
+        case delayNavigate(PushDetailModel), removeLoading, pushDetail
     }
 
     var uiState: UiState

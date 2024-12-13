@@ -20,21 +20,21 @@ struct PushDetail: View {
             VStack {
                 Text(presenter.state.uiState.modelId ?? "")
                 Button {
-                    presenter.send(.pop)
+                    presenter.send(.back)
                 } label: {
                     Text("Back")
                 }
                 .buttonStyle(.bordered)
 
                 Button {
-                    presenter.send(.navigate(.detail(.init(id: "mi-push mi-scorpion et re mi-push derrière"))))
+                    presenter.send(.pushDetail)
                 } label: {
                     Text("push")
                 }
                 .buttonStyle(.bordered)
 
                 Button {
-                    presenter.send(.popToRoot)
+                    presenter.send(.back)
                 } label: {
                     Text("popToRoot")
                 }

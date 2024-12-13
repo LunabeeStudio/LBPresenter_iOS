@@ -9,9 +9,9 @@ import Foundation
 import Combine
 
 struct PublishedReducer {
-    @MainActor static var cancellables: Set<AnyCancellable> = []
+    nonisolated(unsafe) static var cancellables: Set<AnyCancellable> = []
 
-    @MainActor static let reducer: Reducer<PublishedState, Never> = .init(reduce: { state, action in
+    static let reducer: Reducer<PublishedState, Never> = .init(reduce: { state, action in
         switch action {
         case .startTimer:
             state.uiState = .loading

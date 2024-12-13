@@ -14,6 +14,7 @@ struct PushDetailState: PresenterState {
     }
 
     enum Action: Sendable {
+        case back, backToRoot, pushDetail
     }
 
     var uiState: UiState

@@ -6,12 +6,16 @@
 //
 
 struct PushReducer {
-    @MainActor static let reducer: Reducer<PushState, PushFlowState> = .init(reduce: { state, action in
+    static let reducer: Reducer<PushState, PushFlowState> = .init(reduce: { state, action in
         switch action {
         case .removeLoading:
             state.uiState.isLoading = false
             return .run { _, send in
                 send(.navigate(.detail(PushDetailModel(id: "pushed with delay"))))
+            }
+        case .pushDetail:
+            return .run { _, send in
+                send(.navigate(.detail(.init(id: "pushed"))))
             }
         case let .delayNavigate(model):
             state.uiState.isLoading = true
