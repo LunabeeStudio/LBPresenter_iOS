@@ -24,7 +24,7 @@ extension FlowPresenterState where Path == [Destination] {
         if let destination {
             path.append(destination)
         } else {
-            path.removeLast()
+            pop()
         }
     }
 

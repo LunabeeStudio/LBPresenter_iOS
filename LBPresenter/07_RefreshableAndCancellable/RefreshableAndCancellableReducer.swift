@@ -9,7 +9,7 @@ struct RefreshableAndCancellableReducer {
 
     private enum CancelID: String { case refreshable }
 
-    static let reducer: LBPresenter<RefreshableAndCancellableState, Never>.Reducer = { state, action in
+    @MainActor static let reducer: Reducer<RefreshableAndCancellableState, Never> = .init(reduce: { state, action in
         switch action {
         case .refreshData:
             return .run({ send, _ in
@@ -26,5 +26,5 @@ struct RefreshableAndCancellableReducer {
         case .cancel:
             return .cancel(cancelId: CancelID.refreshable.rawValue)
         }
-    }
+    })
 }

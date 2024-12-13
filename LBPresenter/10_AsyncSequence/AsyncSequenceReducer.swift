@@ -8,7 +8,7 @@
 import Foundation
 
 struct AsyncSequenceReducer {
-    static let reducer: LBPresenter<AsyncSequenceState, Never>.Reducer = { state, action in
+    @MainActor static let reducer: Reducer<AsyncSequenceState, Never> = .init(reduce: { state, action in
         switch action {
         case .startEmitter:
             return .run { send, _  in
@@ -25,5 +25,5 @@ struct AsyncSequenceReducer {
             state.state = .data(date)
             return .none
         }
-    }
+    })
 }

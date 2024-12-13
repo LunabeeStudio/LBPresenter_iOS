@@ -9,12 +9,12 @@ import Combine
 import SwiftUI
 import Foundation
 
+protocol LBPresenterProtocol: ObservableObject {}
+
 @MainActor
 /// A generic presenter that handles state and effects for a SwiftUI view using a reducer pattern.
-class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
-    /// Type alias for the reducer function that handles state transitions and produces side effects.
-    typealias Reducer = @MainActor (_ state: inout State, _ action: State.Action) -> Effect<State.Action, NavState.Action>
-    typealias NavReducer = @MainActor (_ navState: inout NavState, _ action: NavState.Action) -> Void
+final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>: LBPresenterProtocol {
+    var children: [any LBPresenterProtocol] = []
 
     /// The current state of the presenter, published to notify SwiftUI views of any changes.
     /// The state is `private(set)` to restrict modifications to the presenter logic only.
@@ -22,16 +22,17 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
         willSet { objectWillChange.send(with: newValue, oldValue: state) }
     }
 
-    private(set) var navState: NavState! {
-        willSet { objectWillChange.send(with: newValue, oldValue: navState) }
-    } // force unwrapped to force instantiation when needed
+    private(set) var navState: NavState! { // force unwrapped to force instantiation when needed
+        didSet { objectWillChange.send() }
+    }
 
     /// The reducer function used to compute the next state and potential side effects based on an action.
-    let reducer: Reducer
-    let navReducer: NavReducer! // force unwrapped to force instantiation when needed
+    let reducer: Reducer<State, NavState>
+    let navReducer: NavReducer<NavState>! // force unwrapped to force instantiation when needed
 
     /// A reference to the currently running effect tasks, used to manage cancellable async operations.
     private let cancellationCancellables: CancellablesCollection = .init()
+    private var cancellables: Set<AnyCancellable> = []
 
     /// Initializes the presenter with an initial state, a list of initial actions to process, and a reducer function.
     ///
@@ -47,7 +48,7 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
     ///   - reducer: The reducer function that handles state transitions and defines any associated side effects.
     ///     The reducer determines how the state evolves in response to actions and can trigger additional
     ///     operations via effects.
-    init(initialState: State, initialActions: [State.Action]? = nil, reducer: @escaping Reducer) {
+    init(initialState: State, initialActions: [State.Action]? = nil, reducer: Reducer<State, NavState>) {
         state = initialState
         self.reducer = reducer
         self.navState = nil
@@ -55,12 +56,23 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
         initialActions?.forEach { send($0) }
     }
 
-    init(initialState: State, initialActions: [State.Action]? = nil, reducer: @escaping Reducer, navState: NavState, navReducer: @escaping NavReducer) {
+    init(initialState: State, initialActions: [State.Action]? = nil, reducer: Reducer<State, NavState>, navState: NavState, navReducer: NavReducer<NavState>) {
         self.state = initialState
         self.reducer = reducer
         self.navState = navState
         self.navReducer = navReducer
         initialActions?.forEach { send($0) }
+    }
+
+    func getChild<ChildState: Actionnable>(for state: ChildState, and reducer: Reducer<ChildState, NavState>) -> LBPresenter<ChildState, NavState> {
+        let presenter: LBPresenter<ChildState, NavState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
+        children.append(presenter)
+        presenter.objectWillChange
+            .sink { [weak self] _ in
+                self?.navState = presenter.navState
+            }
+            .store(in: &cancellables)
+        return presenter
     }
 
     /// Sends an action to the presenter, updating the state and potentially executing a side effect.
@@ -81,7 +93,7 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
                     self?.send(action)
                 })
             }
-            let cancellable = AnyCancellable { task.cancel() }
+            let cancellable: AnyCancellable = .init { task.cancel() }
             cancellationCancellables.insert(cancellable, at: cancelId)
             Task {
                 defer { cancellationCancellables.remove(cancellable, at: cancelId) }
@@ -118,7 +130,7 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
                         self?.send(action)
                     })
                 }
-                let cancellable = AnyCancellable { task.cancel() }
+                let cancellable: AnyCancellable = .init { task.cancel() }
                 cancellationCancellables.insert(cancellable, at: myCancelId)
                 defer { cancellationCancellables.remove(cancellable, at: myCancelId) }
                 // Wait for the task to finish and clean up after completion
@@ -148,7 +160,9 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
             }
         )
     }
+}
 
+extension LBPresenter where NavState.Path == [NavState.Destination] {
     /// Creates a SwiftUI `Binding` that observes and updates a bidirectional collection
     /// while sending an action whenever the collection's last element changes.
     ///
@@ -162,19 +176,17 @@ class LBPresenter<State: Actionnable, NavState: Actionnable>: ObservableObject {
     /// - Note:
     ///   This binding only reacts to changes in the last element of the collection.
     ///   The `action` is triggered only when the collection's `last` property is updated.
-    func binding<Value: BidirectionalCollection>(
-        for value: Value,
-        send action: @escaping (Value.Element?) -> NavState.Action
-    ) -> Binding<Value> where Value.Element: Hashable {
+    func bindPath(send action: @escaping (NavState.Path.Element?) -> NavState.Action) -> Binding<NavState.Path> {
         Binding(
             // The getter for the binding returns the current value of the collection.
-            get: { value },
+            get: { self.navState.path },
             // The setter for the binding updates the collection and triggers the `action` for the last element.
             set: { [weak self] newValue, _ in
+                guard let self else { return }
                 // Send the action associated with the last element to the `NavState`.
-                var destination: Value.Element? = newValue.last
-                if newValue.count < value.count { destination = nil } // pop
-                self?.send(action(destination))
+                var destination: NavState.Path.Element? = newValue.last
+                if newValue.count < navState.path.count { destination = nil } // pop
+                self.send(action(destination))
             }
         )
     }
@@ -239,10 +251,7 @@ extension View {
     ///   - presenter: The `LBPresenter` responsible for managing the state and sending actions.
     ///   - action: The action of type `State.Action` to send to the presenter when the task executes.
     /// - Returns: A view with the task attached.
-    func task<State: PresenterState, NavState: Actionnable>(
-        _ presenter: LBPresenter<State, NavState>,
-        action: State.Action
-    ) -> some View where State.Action: Sendable {
+    func task<State: PresenterState, NavState: Actionnable>(_ presenter: LBPresenter<State, NavState>, action: State.Action) -> some View where State.Action: Sendable {
         // The `.task` modifier allows asynchronous code to run when the view appears.
         self.task {
             await presenter.send(action)
@@ -258,10 +267,7 @@ extension View {
     ///   - presenter: The `LBPresenter` responsible for managing the state and sending actions.
     ///   - action: The action of type `State.Action` to send to the presenter when the refresh is triggered.
     /// - Returns: A view with the refreshable behavior attached.
-    func refreshable<State: PresenterState, NavState: Actionnable>(
-        _ presenter: LBPresenter<State, NavState>,
-        action: State.Action
-    ) -> some View where State.Action: Sendable {
+    func refreshable<State: PresenterState, NavState: Actionnable>(_ presenter: LBPresenter<State, NavState>, action: State.Action) -> some View where State.Action: Sendable {
         // The `.refreshable` modifier handles the pull-to-refresh gesture and executes asynchronous code.
         self.refreshable {
             await presenter.send(action)
@@ -269,80 +275,14 @@ extension View {
     }
 }
 
-// Extension to make the `Never` type conform to the `Actionnable` protocol.
-extension Never: Actionnable {
-    /// The `Action` associated type for `Never` is also `Never`,
-    /// since `Never` represents a type that cannot have any instances.
-    ///
-    /// This is useful for cases where no navigation actions are needed.
+// Extension to make the `Never` type conform to the `FlowPresenterState` protocol.
+extension Never: FlowPresenterState {
+    var path: Never {
+        get { fatalError() }
+        set {}
+    }
+
+    typealias Path = Never
+    typealias Destination = Never
     typealias Action = Never
-}
-
-/// A wrapper for a generic `send` function to safely handle type-erased actions.
-/// This wrapper is `Sendable` to ensure thread-safety in Swift's concurrency model.
-struct NavigationContextWrapper: Sendable {
-    // A private closure that handles sending type-erased actions.
-    // It accepts `Any` and validates the type before forwarding it.
-    private let _send: @MainActor (Any) -> Void
-    private let _context: any KeyPathAccessible
-
-    /// Initializes the wrapper with a strongly-typed `send` function.
-    /// The closure is type-erased to handle any input conforming to the expected action type.
-    /// - Parameter send: A closure to process actions of a specific type.
-    init<Action>(context: any KeyPathAccessible, send: @escaping @MainActor (Action) -> Void) {
-        self._context = context
-        self._send = { anyValue in
-            // Ensure the value is of the expected `Action` type before sending.
-            guard let value = anyValue as? Action else {
-                assertionFailure("Type mismatch: Expected \(Action.self), got \(type(of: anyValue))")
-                return
-            }
-            send(value)
-        }
-    }
-
-    /// Sends an action of a specific type to the underlying closure.
-    /// - Parameter value: The action to send.
-    @MainActor func send<Action>(_ value: Action) {
-        _send(value)
-    }
-
-    func get<T: KeyPathAccessible, V>(_ keyPath: KeyPath<T, V>) -> V? {
-        (_context as? T)?.get(keyPath)
-    }
-}
-
-protocol KeyPathAccessible: Sendable {
-    func get<V>(_ keyPath: KeyPath<Self, V>) -> V?
-}
-
-extension KeyPathAccessible {
-    func get<V>(_ keyPath: KeyPath<Self, V>) -> V? {
-        self[keyPath: keyPath]
-    }
-}
-
-/// A private environment key for storing the `SendFunctionWrapper`.
-/// This key allows the wrapper to be passed through SwiftUI's environment.
-private struct NavigationContextEnvironmentKey: EnvironmentKey {
-    // The default value for the environment key is `nil` because no wrapper exists initially.
-    static let defaultValue: NavigationContextWrapper? = nil
-}
-
-extension EnvironmentValues {
-    /// A computed property to access or set the `SendFunctionWrapper` in the environment.
-    var navigationContext: NavigationContextWrapper? {
-        get { self[NavigationContextEnvironmentKey.self] }
-        set { self[NavigationContextEnvironmentKey.self] = newValue }
-    }
-}
-
-extension View {
-    /// Sets up the navigation context in the SwiftUI environment.
-    /// This allows child views to access the `SendFunctionWrapper` for navigation actions.
-    /// - Parameter presenter: The presenter providing the `send` function to handle navigation actions.
-    /// - Returns: A view modified with the navigation context environment value.
-    func setNavigation<State, NavState, NavigationContext: KeyPathAccessible>(context: NavigationContext, with presenter: LBPresenter<State, NavState>) -> some View {
-        self.environment(\.navigationContext, NavigationContextWrapper(context: context, send: presenter.send(_:)))
-    }
 }

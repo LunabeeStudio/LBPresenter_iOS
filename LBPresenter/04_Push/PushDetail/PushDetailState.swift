@@ -14,12 +14,11 @@ struct PushDetailState: PresenterState {
     }
 
     enum Action: Sendable {
-        case setInitialState(modelId: String?)
     }
 
     var uiState: UiState
 
-    init(modelId: String? = nil) {
+    init(modelId: String) {
         self.uiState = .init(modelId: modelId)
     }
 }

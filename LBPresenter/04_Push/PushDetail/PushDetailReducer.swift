@@ -6,11 +6,9 @@
 //
 
 struct PushDetailReducer {
-    static let reducer: LBPresenter<PushDetailState, Never>.Reducer = { state, action in
+    @MainActor static let reducer: Reducer<PushDetailState, PushFlowState> = .init(reduce: { state, action in
         switch action {
-        case let .setInitialState(modelId: id):
-            state.uiState.modelId = id
-            return .none
-        }
+
     }
+    })
 }

@@ -20,6 +20,7 @@ struct SideEffect: View {
             List {
                 Text("Data Screen")
                 Button {
+
                     presenter.send(.showLoadingThenData)
                 } label: {
                     Text("Show Loading then Data")

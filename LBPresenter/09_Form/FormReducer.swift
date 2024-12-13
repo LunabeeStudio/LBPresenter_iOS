@@ -10,7 +10,7 @@ import Foundation
 struct FormReducer {
     private enum CancelID: String { case bouncing }
 
-    static let reducer: LBPresenter<FormState, Never>.Reducer = { state, action in
+    @MainActor static let reducer: Reducer<FormState, Never> = .init(reduce: { state, action in
         switch action {
         case .nameChanged(let name):
             if name != state.uiState.formData.name {
@@ -65,7 +65,7 @@ struct FormReducer {
             state.uiState.field = field
             return .none
         }
-    }
+    })
 
     // Email validation function
     private static func validateEmail(_ input: String) -> Bool {

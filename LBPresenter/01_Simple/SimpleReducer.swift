@@ -6,7 +6,7 @@
 //
 
 struct SimpleReducer {
-    static let reducer: LBPresenter<SimpleState, Never>.Reducer = { state, action in
+    @MainActor static let reducer: Reducer<SimpleState, Never> = .init(reduce: { state, action in
         .none
-    }
+    })
 }

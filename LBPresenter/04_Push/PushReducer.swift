@@ -6,7 +6,7 @@
 //
 
 struct PushReducer {
-    static let reducer: LBPresenter<PushState, PushFlowState>.Reducer = { state, action in
+    @MainActor static let reducer: Reducer<PushState, PushFlowState> = .init(reduce: { state, action in
         switch action {
         case .removeLoading:
             state.uiState.isLoading = false
@@ -20,9 +20,9 @@ struct PushReducer {
                 send(.removeLoading)
             }
         }
-    }
+    })
 
-    static let navReducer: LBPresenter<PushState, PushFlowState>.NavReducer = { state, action in
+    @MainActor static let navReducer: NavReducer<PushFlowState> = .init(navReduce: { state, action in
         switch action {
         case let .navigate(model):
             state.navigate(to: model)
@@ -31,5 +31,5 @@ struct PushReducer {
         case .popToRoot:
             state.popToRoot()
         }
-    }
+    })
 }

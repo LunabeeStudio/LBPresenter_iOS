@@ -14,7 +14,7 @@ struct Push: View {
 
     var body: some View {
         let _ = Self._printChanges()
-        NavigationStack(path: presenter.binding(for: presenter.navState.path, send: PushFlowState.Action.navigate)) {
+        NavigationStack(path: presenter.bindPath(send: PushFlowState.Action.navigate)) {
             List {
                 VStack {
                     Button {
@@ -49,8 +49,7 @@ struct Push: View {
             .navigationDestination(for: PushFlowState.Destination.self) { destination in
                 switch destination {
                 case let .detail(model):
-                    PushDetail()
-                        .setNavigation(context: model, with: presenter)
+                    PushDetail(presenter: presenter.getChild(for: .init(modelId: model.id), and: PushDetailReducer.reducer))
                 }
             }
         }

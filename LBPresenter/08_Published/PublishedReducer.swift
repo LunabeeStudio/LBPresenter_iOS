@@ -11,7 +11,7 @@ import Combine
 struct PublishedReducer {
     @MainActor static var cancellables: Set<AnyCancellable> = []
 
-    static let reducer: LBPresenter<PublishedState, Never>.Reducer = { state, action in
+    @MainActor static let reducer: Reducer<PublishedState, Never> = .init(reduce: { state, action in
         switch action {
         case .startTimer:
             state.uiState = .loading
@@ -43,5 +43,5 @@ struct PublishedReducer {
             cancellables.removeAll()
             return .none
         }
-    }
+    })
 }

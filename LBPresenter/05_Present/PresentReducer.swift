@@ -6,7 +6,7 @@
 //
 
 struct PresentReducer {
-    static let reducer: LBPresenter<PresentState, Never>.Reducer = { state, action in
+    @MainActor static let reducer: Reducer<PresentState, Never> = .init(reduce: { state, action in
         switch action {
         case .present(nil):
             switch state.uiState {
@@ -21,5 +21,5 @@ struct PresentReducer {
                 return .none
             }
         }
-    }
+    })
 }

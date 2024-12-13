@@ -8,8 +8,11 @@
 import SwiftUI
 
 struct PushDetail: View {
-    @StateObject private var presenter: LBPresenter<PushDetailState, Never> = .init(initialState: .init(), reducer: PushDetailReducer.reducer)
-    @Environment(\.navigationContext) private var context
+    @ObservedObject private var presenter: LBPresenter<PushDetailState, PushFlowState>
+
+    init(presenter: LBPresenter<PushDetailState, PushFlowState>) {
+        self.presenter = presenter
+    }
 
     var body: some View {
         let _ = Self._printChanges()
@@ -17,30 +20,27 @@ struct PushDetail: View {
             VStack {
                 Text(presenter.state.uiState.modelId ?? "")
                 Button {
-                    context?.send(PushFlowState.Action.pop)
+                    presenter.send(.pop)
                 } label: {
                     Text("Back")
                 }
                 .buttonStyle(.bordered)
 
                 Button {
-                    context?.send(PushFlowState.Action.navigate(.detail(.init(id: "mi-push mi-scorpion et re mi-push derrière"))))
+                    presenter.send(.navigate(.detail(.init(id: "mi-push mi-scorpion et re mi-push derrière"))))
                 } label: {
                     Text("push")
                 }
                 .buttonStyle(.bordered)
 
                 Button {
-                    context?.send(PushFlowState.Action.popToRoot)
+                    presenter.send(.popToRoot)
                 } label: {
                     Text("popToRoot")
                 }
                 .buttonStyle(.bordered)
             }
             .padding()
-        }
-        .onAppear {
-            presenter.send(.setInitialState(modelId: context?.get(\PushDetailModel.id)))
         }
     }
 }
