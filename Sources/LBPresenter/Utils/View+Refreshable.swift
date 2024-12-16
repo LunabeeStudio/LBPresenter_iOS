@@ -7,22 +7,29 @@
 
 import SwiftUI
 
-// Extension to the View protocol to add custom task and refreshable modifiers
+// Extension to the View protocol to add custom task and refreshable modifiers.
 extension View {
 
-    /// Adds a pull-to-refresh interaction to the view that sends an action to the presenter.
+    /// Adds a pull-to-refresh interaction to the view, triggering an action in the presenter.
     ///
-    /// This modifier is triggered when the user performs a "pull-to-refresh" gesture.
-    /// It's a specialized version of the `.refreshable` modifier, tailored for use with an `LBPresenter`.
+    /// This modifier enables pull-to-refresh functionality and is designed for integration with an `LBPresenter`.
+    /// When the user performs a pull-to-refresh gesture, the specified action is sent asynchronously to the presenter.
     ///
     /// - Parameters:
-    ///   - presenter: The `LBPresenter` responsible for managing the state and sending actions.
-    ///   - action: The action of type `State.Action` to send to the presenter when the refresh is triggered.
-    /// - Returns: A view with the refreshable behavior attached.
-    public func refreshable<State: PresenterState, NavState: Actionnable>(_ presenter: LBPresenter<State, NavState>, action: State.Action) -> some View where State.Action: Sendable {
-        // The `.refreshable` modifier handles the pull-to-refresh gesture and executes asynchronous code.
+    ///   - presenter: An instance of `LBPresenter` responsible for managing state and handling actions.
+    ///   - action: An action of type `State.Action` to be sent to the presenter when the refresh is triggered.
+    /// - Returns: A modified view with pull-to-refresh functionality.
+    ///
+    /// - Note:
+    ///   - This is a specialized wrapper around SwiftUI's `.refreshable` modifier, tailored for use with `LBPresenter`.
+    ///   - The action is sent asynchronously using the `send` method of the presenter.
+    public func refreshable<State: PresenterState, NavState: Actionnable>(
+        _ presenter: LBPresenter<State, NavState>,
+        action: State.Action
+    ) -> some View where State.Action: Sendable {
+        // The `.refreshable` modifier handles the pull-to-refresh interaction and executes the provided async code.
         self.refreshable {
-            await presenter.send(action)
+            await presenter.send(action) // Send the specified action to the presenter asynchronously.
         }
     }
 }

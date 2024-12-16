@@ -7,50 +7,52 @@
 
 import Combine
 
-// Extension to ObservableObjectPublisher to add a helper method for conditional publishing
+// Extension to ObservableObjectPublisher to add a helper method for conditional publishing.
 extension ObservableObjectPublisher {
-    /// Sends an update to notify subscribers of changes only if the new value is different from the old value.
+    /// Publishes an update to notify subscribers only if the new value differs from the old value.
     ///
     /// - Parameters:
     ///   - newValue: The new value of a type conforming to the `Actionnable` protocol.
     ///   - oldValue: The previous value of the same type.
     ///
-    /// This method uses the `isEqual(to:)` method from the `Actionnable` protocol to compare the old and new values.
-    /// If they are equal, no notification is sent to avoid unnecessary updates. Otherwise, it triggers a change notification.
+    /// This method compares the old and new values using the `isEqual(to:)` method provided
+    /// by the `Actionnable` protocol. If the values are deemed equal, no notification is sent,
+    /// avoiding redundant updates. If they are different, the method triggers a change notification.
     func send<T: Actionnable>(with newValue: T, oldValue: T) {
-        // Check if the old and new values are equal using the `isEqual(to:)` method.
+        // Use `isEqual(to:)` to compare the values. Send only if they differ.
         if oldValue.isEqual(to: newValue) {
-            // If the values are equal, no changes have occurred, so exit without sending a notification.
-            return
+            return // Skip sending a notification if the values are equal.
         }
-        // If the values are different, notify all subscribers of the change.
-        send()
+        send() // Notify subscribers if the values differ.
     }
 }
 
+// Extension to add comparison functionality for `Actionnable` types.
 private extension Actionnable {
-    /// Compares two states for equality.
+    /// Determines if two instances are considered equal.
     ///
-    /// - Parameter rhs: The other state to compare to.
-    /// - Returns: `true` if the states are considered equal, `false` otherwise.
+    /// - Parameter rhs: The other instance to compare to.
+    /// - Returns: `true` if the instances are equal, otherwise `false`.
+    ///
+    /// This method checks if the instances conform to `Equatable` and compares them directly.
+    /// If not, it assumes the instances are not equal.
     func isEqual(to rhs: Self) -> Bool {
-        // Check if both states conform to `Equatable` and compare them directly.
         if let lhs = self as? any Equatable,
            let rhs = rhs as? any Equatable {
-            return lhs.isEqual(to: rhs)
+            return lhs.isEqual(to: rhs) // Compare using `Equatable` conformance.
         }
-        // If not `Equatable`, assume they are different.
-        return false
+        return false // Default to unequal if `Equatable` is not implemented.
     }
 }
 
+// Extension to `Equatable` to enable dynamic type comparison.
 private extension Equatable {
-    /// Compares this instance to another using dynamic type casting.
+    /// Compares this instance to another dynamically typed value.
     ///
-    /// - Parameter rhs: The other value to compare to.
-    /// - Returns: `true` if the values are equal, `false` otherwise.
+    /// - Parameter rhs: The value to compare against.
+    /// - Returns: `true` if the values are equal and of the same type, otherwise `false`.
     func isEqual(to rhs: Any) -> Bool {
-        guard let rhs = rhs as? Self else { return false }
-        return self == rhs
+        guard let rhs = rhs as? Self else { return false } // Ensure the types match.
+        return self == rhs // Compare using `Equatable` equality.
     }
 }

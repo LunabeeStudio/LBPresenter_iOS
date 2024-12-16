@@ -8,29 +8,34 @@
 import SwiftUI
 
 extension LBPresenter where NavState.Path == [NavState.Destination] {
-    /// Creates a SwiftUI `Binding` that observes and updates a bidirectional collection
-    /// while sending an action whenever the collection's last element changes.
+    /// Creates a SwiftUI `Binding` that synchronizes a navigation path with the presenter's state
+    /// and sends an action when the path's last element changes.
     ///
     /// - Parameters:
-    ///   - value: The current value of the collection to bind to. Must conform to `BidirectionalCollection`.
-    ///   - action: A closure that takes the last element of the collection as input
-    ///             and returns an action of type `NavState.Action`.
+    ///   - action: A closure that generates an action of type `NavState.Action`
+    ///             based on the last element of the navigation path.
     ///
-    /// - Returns: A `Binding` for the given collection that updates its value and triggers an action when its last element changes.
+    /// - Returns: A `Binding` that updates the navigation path and triggers the provided action
+    ///            when its last element changes.
     ///
-    /// - Note:
-    ///   This binding only reacts to changes in the last element of the collection.
-    ///   The `action` is triggered only when the collection's `last` property is updated.
+    /// - Discussion:
+    ///   - The `Binding` observes changes to the navigation path (`NavState.Path`) and allows
+    ///     two-way updates between SwiftUI views and the presenter's state.
+    ///   - The provided `action` is sent whenever the path's last element is modified, appended, or removed.
+    ///   - If the path is shortened (e.g., a "pop" operation), the action is called with `nil`.
     public func bindPath(send action: @escaping (NavState.Path.Element?) -> NavState.Action) -> Binding<NavState.Path> {
         Binding(
-            // The getter for the binding returns the current value of the collection.
+            // The getter provides the current navigation path from the presenter's state.
             get: { self.navState.path },
-            // The setter for the binding updates the collection and triggers the `action` for the last element.
+            // The setter updates the navigation path and triggers the provided action.
             set: { [weak self] newValue, _ in
                 guard let self else { return }
-                // Send the action associated with the last element to the `NavState`.
+
+                // Determine the last element of the updated path, or nil if the path was shortened.
                 var destination: NavState.Path.Element? = newValue.last
-                if newValue.count < navState.path.count { destination = nil } // pop
+                if newValue.count < navState.path.count { destination = nil } // Handle "pop" operation
+
+                // Send the action corresponding to the updated last element.
                 self.send(navAction: action(destination))
             }
         )
