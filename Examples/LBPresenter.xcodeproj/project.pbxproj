@@ -6,14 +6,87 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		939909992D106293002DB499 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 939909932D106293002DB499 /* Assets.xcassets */; };
+		9399099D2D106293002DB499 /* DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 939909952D106293002DB499 /* DemoApp.swift */; };
+		939909BB2D106293002DB499 /* Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 939909942D106293002DB499 /* Demo.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		939909612D1061BE002DB499 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		C83BF84B2CFDF10400873704 /* LBPresenter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBPresenter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		939909932D106293002DB499 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		939909942D106293002DB499 /* Demo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Demo.swift; sourceTree = "<group>"; };
+		939909952D106293002DB499 /* DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoApp.swift; sourceTree = "<group>"; };
+		939909962D106293002DB499 /* LBPresenter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LBPresenter.entitlements; sourceTree = "<group>"; };
+		C83BF84B2CFDF10400873704 /* Examples.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Examples.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		C83BF84D2CFDF10400873704 /* LBPresenter */ = {
+		939909652D106293002DB499 /* 01_Simple */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = LBPresenter;
+			path = 01_Simple;
+			sourceTree = "<group>";
+		};
+		939909692D106293002DB499 /* 02_Action */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 02_Action;
+			sourceTree = "<group>";
+		};
+		9399096D2D106293002DB499 /* 03_SideEffect */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 03_SideEffect;
+			sourceTree = "<group>";
+		};
+		939909772D106293002DB499 /* 04_Push */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 04_Push;
+			sourceTree = "<group>";
+		};
+		9399097C2D106293002DB499 /* 05_Present */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 05_Present;
+			sourceTree = "<group>";
+		};
+		939909802D106293002DB499 /* 06_TextField */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 06_TextField;
+			sourceTree = "<group>";
+		};
+		939909842D106293002DB499 /* 07_RefreshableAndCancellable */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 07_RefreshableAndCancellable;
+			sourceTree = "<group>";
+		};
+		939909892D106293002DB499 /* 08_Published */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 08_Published;
+			sourceTree = "<group>";
+		};
+		9399098D2D106293002DB499 /* 09_Form */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 09_Form;
+			sourceTree = "<group>";
+		};
+		939909922D106293002DB499 /* 10_AsyncSequence */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = 10_AsyncSequence;
+			sourceTree = "<group>";
+		};
+		939909982D106293002DB499 /* Preview Content */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -32,7 +105,21 @@
 		C83BF8422CFDF10400873704 = {
 			isa = PBXGroup;
 			children = (
-				C83BF84D2CFDF10400873704 /* LBPresenter */,
+				939909652D106293002DB499 /* 01_Simple */,
+				939909692D106293002DB499 /* 02_Action */,
+				9399096D2D106293002DB499 /* 03_SideEffect */,
+				939909772D106293002DB499 /* 04_Push */,
+				9399097C2D106293002DB499 /* 05_Present */,
+				939909802D106293002DB499 /* 06_TextField */,
+				939909842D106293002DB499 /* 07_RefreshableAndCancellable */,
+				939909892D106293002DB499 /* 08_Published */,
+				9399098D2D106293002DB499 /* 09_Form */,
+				939909922D106293002DB499 /* 10_AsyncSequence */,
+				939909932D106293002DB499 /* Assets.xcassets */,
+				939909942D106293002DB499 /* Demo.swift */,
+				939909952D106293002DB499 /* DemoApp.swift */,
+				939909962D106293002DB499 /* LBPresenter.entitlements */,
+				939909982D106293002DB499 /* Preview Content */,
 				C83BF84C2CFDF10400873704 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,7 +127,7 @@
 		C83BF84C2CFDF10400873704 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C83BF84B2CFDF10400873704 /* LBPresenter.app */,
+				C83BF84B2CFDF10400873704 /* Examples.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,26 +135,37 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C83BF84A2CFDF10400873704 /* LBPresenter */ = {
+		C83BF84A2CFDF10400873704 /* Examples */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C83BF85A2CFDF10500873704 /* Build configuration list for PBXNativeTarget "LBPresenter" */;
+			buildConfigurationList = C83BF85A2CFDF10500873704 /* Build configuration list for PBXNativeTarget "Examples" */;
 			buildPhases = (
 				C83BF8472CFDF10400873704 /* Sources */,
 				C83BF8482CFDF10400873704 /* Frameworks */,
 				C83BF8492CFDF10400873704 /* Resources */,
+				939909612D1061BE002DB499 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				C83BF84D2CFDF10400873704 /* LBPresenter */,
+				939909652D106293002DB499 /* 01_Simple */,
+				939909692D106293002DB499 /* 02_Action */,
+				9399096D2D106293002DB499 /* 03_SideEffect */,
+				939909772D106293002DB499 /* 04_Push */,
+				9399097C2D106293002DB499 /* 05_Present */,
+				939909802D106293002DB499 /* 06_TextField */,
+				939909842D106293002DB499 /* 07_RefreshableAndCancellable */,
+				939909892D106293002DB499 /* 08_Published */,
+				9399098D2D106293002DB499 /* 09_Form */,
+				939909922D106293002DB499 /* 10_AsyncSequence */,
+				939909982D106293002DB499 /* Preview Content */,
 			);
-			name = LBPresenter;
+			name = Examples;
 			packageProductDependencies = (
 			);
 			productName = TCAV2;
-			productReference = C83BF84B2CFDF10400873704 /* LBPresenter.app */;
+			productReference = C83BF84B2CFDF10400873704 /* Examples.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -99,7 +197,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C83BF84A2CFDF10400873704 /* LBPresenter */,
+				C83BF84A2CFDF10400873704 /* Examples */,
 			);
 		};
 /* End PBXProject section */
@@ -109,6 +207,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				939909992D106293002DB499 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +218,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9399099D2D106293002DB499 /* DemoApp.swift in Sources */,
+				939909BB2D106293002DB499 /* Demo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -244,10 +345,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LBPresenter/LBPresenter.entitlements;
+				CODE_SIGN_ENTITLEMENTS = LBPresenter.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"LBPresenter/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = VH79XGK7M2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -263,7 +364,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
@@ -271,10 +372,11 @@
 				PRODUCT_BUNDLE_IDENTIFIER = studio.lunabee.LBPresenter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Debug;
@@ -284,10 +386,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LBPresenter/LBPresenter.entitlements;
+				CODE_SIGN_ENTITLEMENTS = LBPresenter.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"LBPresenter/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Preview Content\"";
 				DEVELOPMENT_TEAM = VH79XGK7M2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -303,7 +405,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.0;
@@ -311,10 +413,11 @@
 				PRODUCT_BUNDLE_IDENTIFIER = studio.lunabee.LBPresenter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Release;
@@ -331,7 +434,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C83BF85A2CFDF10500873704 /* Build configuration list for PBXNativeTarget "LBPresenter" */ = {
+		C83BF85A2CFDF10500873704 /* Build configuration list for PBXNativeTarget "Examples" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C83BF85B2CFDF10500873704 /* Debug */,
