@@ -45,7 +45,7 @@ struct Demo: View {
                         FormDemo()
                     }
                     NavigationLink("Async Sequence") {
-                        AsyncSequenceView()
+                        AsyncSequenceDemo()
                     }
                 }
             }

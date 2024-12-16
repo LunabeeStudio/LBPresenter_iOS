@@ -90,6 +90,11 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		93990AF92D109D5F002DB499 /* internal */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = internal;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -107,6 +112,7 @@
 		C83BF8422CFDF10400873704 = {
 			isa = PBXGroup;
 			children = (
+				93990AF92D109D5F002DB499 /* internal */,
 				939909652D106293002DB499 /* 01_Simple */,
 				939909692D106293002DB499 /* 02_Action */,
 				9399096D2D106293002DB499 /* 03_SideEffect */,
@@ -162,6 +168,7 @@
 				9399098D2D106293002DB499 /* 09_Form */,
 				939909922D106293002DB499 /* 10_AsyncSequence */,
 				939909982D106293002DB499 /* Preview Content */,
+				93990AF92D109D5F002DB499 /* internal */,
 			);
 			name = Examples;
 			packageProductDependencies = (

@@ -8,6 +8,23 @@
 import SwiftUI
 import LBPresenter
 
+private let readMe = """
+  This example demonstrates navigation handling within a SwiftUI application using a presenter.
+  
+  Key Features:
+  - Utilizes `NavigationStack` for seamless navigation between screens.
+  - Shows how the `LBPresenter` manages navigation state and actions via the `PushReducer` and `PushFlowState`.
+  - Includes examples of immediate and delayed navigation to demonstrate flexible navigation handling.
+  - Displays a loading indicator when the presenter state reflects an ongoing process.
+  
+  Use Cases:
+  - Learn how to implement navigation logic with state management in SwiftUI.
+  - Understand the interaction between navigation state and UI elements in a structured, testable way.
+  - Explore how delayed operations (e.g., network calls) can trigger navigation actions.
+  
+  This example is ideal for understanding navigation patterns in applications with complex state management and dynamic navigation flows.
+  """
+
 struct Push: View {
     @StateObject private var presenter: LBPresenter<PushState, PushFlowState> = .init(initialState: .init(uiState: .init(isLoading: false)), reducer: PushReducer.reducer, navState: .init(), navReducer: PushReducer.navReducer)
 
@@ -16,7 +33,8 @@ struct Push: View {
     var body: some View {
         let _ = Self._printChanges()
         NavigationStack(path: presenter.bindPath(send: PushFlowState.Action.navigate)) {
-            List {
+            Form {
+                AboutView(readMe: readMe)
                 VStack {
                     Button {
                         presenter.send(.pushDetail)
