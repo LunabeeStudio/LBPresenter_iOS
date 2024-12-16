@@ -6,7 +6,7 @@
 //
 
 struct ActionReducer {
-    static let reducer: LBPresenter<ActionState>.Reducer = { state, action in
+    @MainActor static let reducer: Reducer<ActionState, Never> = .init(reduce: { state, action in
         switch action {
         case .increment:
             state.uiState.count += 1
@@ -15,5 +15,5 @@ struct ActionReducer {
             state.uiState.count -= 1
             return .none
         }
-    }
+    })
 }

@@ -6,11 +6,21 @@
 //
 
 struct PushDetailReducer {
-    static let reducer: LBPresenter<PushDetailState>.Reducer = { state, action in
+    @MainActor static let reducer: Reducer<PushDetailState, PushFlowState> = .init(reduce: { state, action in
         switch action {
-        case .back:
-            state.back()
-            return .none
+            case .back:
+                return .run { _, sendNavigation in
+                    sendNavigation(.pop)
+                }
+            case .pushDetail:
+                return .run { _, sendNavigation in
+                    sendNavigation(.navigate(.detail(.init(id: "mi-push mi-scorpion et re mi-push derrière"))))
+                }
+            case .backToRoot:
+                return .run { _, sendNavigation in
+                    sendNavigation(.popToRoot)
+                }
+            }
         }
-    }
+    )
 }

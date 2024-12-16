@@ -6,25 +6,34 @@
 //
 
 struct PushReducer {
-    static let reducer: LBPresenter<PushState>.Reducer = { state, action in
+    static let reducer: Reducer<PushState, PushFlowState> = .init(reduce: { state, action in
         switch action {
-        case .navigate(nil), .pop:
-            state.navigationScope = nil
-            return .none
-        case let .navigate(model):
-            state.navigationScope = model
-            return .run { send in
-                send(.removeLoading, nil)
-            }
         case .removeLoading:
             state.uiState.isLoading = false
-            return .none
+            return .run { _, sendNavigation in
+                sendNavigation(.navigate(.detail(PushDetailModel(id: "pushed with delay"))))
+            }
+        case .pushDetail:
+            return .run { _, sendNavigation in
+                sendNavigation(.navigate(.detail(.init(id: "pushed"))))
+            }
         case let .delayNavigate(model):
             state.uiState.isLoading = true
-            return .run({ send in
-                try? await Task.sleep(for: .seconds(3))
-                send(.navigate(model), nil)
-            })
+            return .run { send, _ in
+                try? await Task.sleep(for: .seconds(2))
+                send(.removeLoading)
+            }
         }
-    }
+    })
+
+    @MainActor static let navReducer: NavReducer<PushFlowState> = .init(navReduce: { state, action in
+        switch action {
+        case let .navigate(model):
+            state.navigate(to: model)
+        case .pop:
+            state.pop()
+        case .popToRoot:
+            state.popToRoot()
+        }
+    })
 }

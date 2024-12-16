@@ -6,19 +6,19 @@
 //
 
 struct SideEffectReducer {
-    static let reducer: LBPresenter<SideEffectState>.Reducer = { state, action in
+    @MainActor static let reducer: Reducer<SideEffectState, Never> = .init(reduce: { state, action in
         switch action {
         case .showLoadingThenData:
             state.uiState = .loading
-            return .run { send in
+            return .run { send, _ in
                 try? await Task.sleep(for: .seconds(1))
-                send(.showData, .init(animation: .easeInOut))
+                send(.showData, transaction: .init(animation: .easeInOut))
             }
         case .showLoadingThenError:
             state.uiState = .loading
-            return .run { send in
+            return .run { send, _ in
                 try? await Task.sleep(for: .seconds(1))
-                send(.showError, .init(animation: .easeInOut))
+                send(.showError, transaction: .init(animation: .easeInOut))
             }
         case .showData:
             state.uiState = .data
@@ -27,5 +27,5 @@ struct SideEffectReducer {
             state.uiState = .error
             return .none
         }
-    }
+    })
 }

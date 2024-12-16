@@ -9,10 +9,10 @@ import Foundation
 import SwiftUI
 
 struct SideEffectState: PresenterState, Equatable {
-
     enum UiState: Equatable {
         case loading, data, error
     }
+
     enum Action: Sendable, Equatable {
         case showLoadingThenData, showLoadingThenError, showData, showError
     }

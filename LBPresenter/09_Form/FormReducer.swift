@@ -10,17 +10,17 @@ import Foundation
 struct FormReducer {
     private enum CancelID: String { case bouncing }
 
-    static let reducer: LBPresenter<FormState>.Reducer = { state, action in
+    @MainActor static let reducer: Reducer<FormState, Never> = .init(reduce: { state, action in
         switch action {
         case .nameChanged(let name):
             if name != state.uiState.formData.name {
                 state.uiState.formData.name = name
                 state.uiState.formData.errorName = ""
-                return .run({ send in
-                    send(.bounce(.bouncing), nil)
+                return .run({ send, _ in
+                    send(.bounce(.bouncing))
                     do {
                         try await Task.sleep(for: .seconds(3))
-                        send(.bounce(.done), nil)
+                        send(.bounce(.done))
                     } catch is CancellationError {
                         print("Task was cancelled")
                     } catch {
@@ -65,7 +65,7 @@ struct FormReducer {
             state.uiState.field = field
             return .none
         }
-    }
+    })
 
     // Email validation function
     private static func validateEmail(_ input: String) -> Bool {

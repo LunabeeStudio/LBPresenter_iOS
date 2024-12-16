@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FormDemo: View {
-    @StateObject private var presenter: LBPresenter<FormState> = .init(initialState: .init(), reducer: FormReducer.reducer)
+    @StateObject private var presenter: LBPresenter<FormState, Never> = .init(initialState: .init(), reducer: FormReducer.reducer)
 
     @FocusState var focus: FormState.Field?
 

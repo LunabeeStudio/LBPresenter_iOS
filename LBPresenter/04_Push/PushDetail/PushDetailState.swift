@@ -9,20 +9,17 @@ import Foundation
 import SwiftUI
 
 struct PushDetailState: PresenterState {
-
     struct UiState: Equatable {
-        var modelId : String
+        var modelId : String?
     }
 
     enum Action: Sendable {
-        case back
+        case back, backToRoot, pushDetail
     }
 
     var uiState: UiState
-    var back: (() -> Void)
 
-    init(modelId: String, back: @escaping () -> Void) {
+    init(modelId: String) {
         self.uiState = .init(modelId: modelId)
-        self.back = back
     }
 }

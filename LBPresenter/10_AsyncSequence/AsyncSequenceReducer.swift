@@ -8,16 +8,16 @@
 import Foundation
 
 struct AsyncSequenceReducer {
-    static let reducer: LBPresenter<AsyncSequenceState>.Reducer = { state, action in
+    @MainActor static let reducer: Reducer<AsyncSequenceState, Never> = .init(reduce: { state, action in
         switch action {
         case .startEmitter:
-            return .run { send in
+            return .run { send, _  in
                 TimerEmitter.shared.startTimer()
             }
         case .startObserve:
-            return .run { send in
+            return .run { send, _ in
                 for await second in TimerEmitter.shared.sequence() {
-                    send(.didReceiveData(.now), .init(animation: .smooth))
+                    send(.didReceiveData(.now), transaction: .init(animation: .smooth))
                 }
             }
         case let .didReceiveData(date):
@@ -25,5 +25,5 @@ struct AsyncSequenceReducer {
             state.state = .data(date)
             return .none
         }
-    }
+    })
 }

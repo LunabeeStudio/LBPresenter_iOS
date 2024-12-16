@@ -9,20 +9,20 @@ import Foundation
 import Combine
 
 struct PublishedReducer {
-    @MainActor static var cancellables: Set<AnyCancellable> = []
+    nonisolated(unsafe) static var cancellables: Set<AnyCancellable> = []
 
-    static let reducer: LBPresenter<PublishedState>.Reducer = { state, action in
+    static let reducer: Reducer<PublishedState, Never> = .init(reduce: { state, action in
         switch action {
         case .startTimer:
             state.uiState = .loading
-            return .run { send in
+            return .run { send, _ in
                 await TimerDataSource.shared.startTimer()
-                send(.showData, .init(animation: .easeInOut))
+                send(.showData, transaction: .init(animation: .easeInOut))
             }
         case .stopTimer:
-            return .run { send in
+            return .run { send, _ in
                 TimerDataSource.shared.stopTimer()
-                send(.showData, .init(animation: .easeInOut))
+                send(.showData, transaction: .init(animation: .easeInOut))
             }
         case .showData:
             state.uiState = .data(timer: nil)
@@ -31,11 +31,11 @@ struct PublishedReducer {
             state.uiState = .data(timer: date)
             return .none
         case .startObserve:
-            return .run { @MainActor send in
+            return .run { @MainActor send, _ in
                 TimerDataSource.shared.observeTimer()
                     .sink {
                         print("update")
-                        send(.timerDidUpdate($0), nil)
+                        send(.timerDidUpdate($0))
                     }
                     .store(in: &cancellables)
             }
@@ -43,5 +43,5 @@ struct PublishedReducer {
             cancellables.removeAll()
             return .none
         }
-    }
+    })
 }
