@@ -13,7 +13,7 @@ public protocol LBPresenterProtocol: ObservableObject {}
 
 @MainActor
 /// A generic presenter that handles state and effects for a SwiftUI view using a reducer pattern.
-public final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>: LBPresenterProtocol {
+public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>: LBPresenterProtocol {
     var children: [any LBPresenterProtocol] = []
 
     /// The current state of the presenter, published to notify SwiftUI views of any changes.
@@ -110,14 +110,14 @@ public final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>
         }
     }
 
-    private func send(navAction: NavState.Action) {
+    func send(navAction: NavState.Action) {
         navReducer(&navState, navAction)
     }
 
     /// Sends an action to the presenter asynchronously, allowing the caller to await its completion.
     ///
     /// - Parameter action: The action to process through the reducer.
-    fileprivate func send(_ action: State.Action, _ transaction: Transaction? = nil) async {
+    func send(_ action: State.Action, _ transaction: Transaction? = nil) async {
         // Handle the effect produced by the reducer.
         let effect: Effect<State.Action, NavState.Action> = withTransaction(transaction ?? .init()) { reducer(&state, action) }
         switch effect {
@@ -168,129 +168,4 @@ public final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>
             }
         )
     }
-}
-
-extension LBPresenter where NavState.Path == [NavState.Destination] {
-    /// Creates a SwiftUI `Binding` that observes and updates a bidirectional collection
-    /// while sending an action whenever the collection's last element changes.
-    ///
-    /// - Parameters:
-    ///   - value: The current value of the collection to bind to. Must conform to `BidirectionalCollection`.
-    ///   - action: A closure that takes the last element of the collection as input
-    ///             and returns an action of type `NavState.Action`.
-    ///
-    /// - Returns: A `Binding` for the given collection that updates its value and triggers an action when its last element changes.
-    ///
-    /// - Note:
-    ///   This binding only reacts to changes in the last element of the collection.
-    ///   The `action` is triggered only when the collection's `last` property is updated.
-    public func bindPath(send action: @escaping (NavState.Path.Element?) -> NavState.Action) -> Binding<NavState.Path> {
-        Binding(
-            // The getter for the binding returns the current value of the collection.
-            get: { self.navState.path },
-            // The setter for the binding updates the collection and triggers the `action` for the last element.
-            set: { [weak self] newValue, _ in
-                guard let self else { return }
-                // Send the action associated with the last element to the `NavState`.
-                var destination: NavState.Path.Element? = newValue.last
-                if newValue.count < navState.path.count { destination = nil } // pop
-                self.send(navAction: action(destination))
-            }
-        )
-    }
-}
-
-// Extension to ObservableObjectPublisher to add a helper method for conditional publishing
-private extension ObservableObjectPublisher {
-    /// Sends an update to notify subscribers of changes only if the new value is different from the old value.
-    ///
-    /// - Parameters:
-    ///   - newValue: The new value of a type conforming to the `Actionnable` protocol.
-    ///   - oldValue: The previous value of the same type.
-    ///
-    /// This method uses the `isEqual(to:)` method from the `Actionnable` protocol to compare the old and new values.
-    /// If they are equal, no notification is sent to avoid unnecessary updates. Otherwise, it triggers a change notification.
-    func send<T: Actionnable>(with newValue: T, oldValue: T) {
-        // Check if the old and new values are equal using the `isEqual(to:)` method.
-        if oldValue.isEqual(to: newValue) {
-            // If the values are equal, no changes have occurred, so exit without sending a notification.
-            return
-        }
-        // If the values are different, notify all subscribers of the change.
-        send()
-    }
-}
-
-private extension Actionnable {
-    /// Compares two states for equality.
-    ///
-    /// - Parameter rhs: The other state to compare to.
-    /// - Returns: `true` if the states are considered equal, `false` otherwise.
-    func isEqual(to rhs: Self) -> Bool {
-        // Check if both states conform to `Equatable` and compare them directly.
-        if let lhs = self as? any Equatable,
-           let rhs = rhs as? any Equatable {
-            return lhs.isEqual(to: rhs)
-        }
-        // If not `Equatable`, assume they are different.
-        return false
-    }
-}
-
-private extension Equatable {
-    /// Compares this instance to another using dynamic type casting.
-    ///
-    /// - Parameter rhs: The other value to compare to.
-    /// - Returns: `true` if the values are equal, `false` otherwise.
-    func isEqual(to rhs: Any) -> Bool {
-        guard let rhs = rhs as? Self else { return false }
-        return self == rhs
-    }
-}
-
-// Extension to the View protocol to add custom task and refreshable modifiers
-extension View {
-    /// Attaches an asynchronous task to the view that sends an action to the presenter.
-    ///
-    /// This task is triggered when the view appears. It's a specialized version of the `.task` modifier,
-    /// designed for use with an `LBPresenter` that manages state and navigation actions.
-    ///
-    /// - Parameters:
-    ///   - presenter: The `LBPresenter` responsible for managing the state and sending actions.
-    ///   - action: The action of type `State.Action` to send to the presenter when the task executes.
-    /// - Returns: A view with the task attached.
-    public func task<State: PresenterState, NavState: Actionnable>(_ presenter: LBPresenter<State, NavState>, action: State.Action) -> some View where State.Action: Sendable {
-        // The `.task` modifier allows asynchronous code to run when the view appears.
-        self.task {
-            await presenter.send(action)
-        }
-    }
-
-    /// Adds a pull-to-refresh interaction to the view that sends an action to the presenter.
-    ///
-    /// This modifier is triggered when the user performs a "pull-to-refresh" gesture.
-    /// It's a specialized version of the `.refreshable` modifier, tailored for use with an `LBPresenter`.
-    ///
-    /// - Parameters:
-    ///   - presenter: The `LBPresenter` responsible for managing the state and sending actions.
-    ///   - action: The action of type `State.Action` to send to the presenter when the refresh is triggered.
-    /// - Returns: A view with the refreshable behavior attached.
-    public func refreshable<State: PresenterState, NavState: Actionnable>(_ presenter: LBPresenter<State, NavState>, action: State.Action) -> some View where State.Action: Sendable {
-        // The `.refreshable` modifier handles the pull-to-refresh gesture and executes asynchronous code.
-        self.refreshable {
-            await presenter.send(action)
-        }
-    }
-}
-
-// Extension to make the `Never` type conform to the `FlowPresenterState` protocol.
-extension Never: FlowPresenterState {
-    public var path: Never {
-        get { fatalError() }
-        set {}
-    }
-
-    public typealias Path = Never
-    public typealias Destination = Never
-    public typealias Action = Never
 }

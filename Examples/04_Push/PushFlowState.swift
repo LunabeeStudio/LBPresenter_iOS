@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import LBPresenter
 
-struct PushFlowState: FlowPresenterState, Equatable {
+struct PushFlowState: NavPresenterState, Equatable {
     typealias Path = [Destination]
     
     enum Action: Sendable, Equatable {
