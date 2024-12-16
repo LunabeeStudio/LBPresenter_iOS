@@ -5,7 +5,7 @@
 //  Created by Rémi Lanteri on 25/11/2024.
 //
 
-protocol Actionnable {
+public protocol Actionnable {
     /// The type of actions that can be handled by the presenter.
     ///
     /// Actions represent events, user interactions, or commands that trigger
@@ -19,7 +19,7 @@ protocol Actionnable {
 ///
 /// Conforming types represent the current state of the application or feature
 /// and facilitate the handling of user or system-initiated actions.
-protocol PresenterState: Actionnable {
+public protocol PresenterState: Actionnable {
     /// The type that encapsulates the state visible to the UI.
     ///
     /// This state represents what the UI observes and reacts to.

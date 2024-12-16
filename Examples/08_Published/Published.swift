@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import LBPresenter
 
 struct PublishedDemo: View {
     @StateObject private var presenter: LBPresenter<PublishedState, Never> = .init(initialState: .init(uiState: .loading), initialActions: [.startTimer], reducer: PublishedReducer.reducer)

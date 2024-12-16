@@ -9,16 +9,16 @@ import Combine
 import SwiftUI
 import Foundation
 
-protocol LBPresenterProtocol: ObservableObject {}
+public protocol LBPresenterProtocol: ObservableObject {}
 
 @MainActor
 /// A generic presenter that handles state and effects for a SwiftUI view using a reducer pattern.
-final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>: LBPresenterProtocol {
+public final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>: LBPresenterProtocol {
     var children: [any LBPresenterProtocol] = []
 
     /// The current state of the presenter, published to notify SwiftUI views of any changes.
     /// The state is `private(set)` to restrict modifications to the presenter logic only.
-    private(set) var state: State {
+    public private(set) var state: State {
         willSet { objectWillChange.send(with: newValue, oldValue: state) }
     }
 
@@ -48,7 +48,7 @@ final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>: LBPre
     ///   - reducer: The reducer function that handles state transitions and defines any associated side effects.
     ///     The reducer determines how the state evolves in response to actions and can trigger additional
     ///     operations via effects.
-    init(initialState: State, initialActions: [State.Action]? = nil, reducer: Reducer<State, NavState>) {
+    public init(initialState: State, initialActions: [State.Action]? = nil, reducer: Reducer<State, NavState>) {
         state = initialState
         self.reducer = reducer
         self.navState = nil
@@ -56,7 +56,7 @@ final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>: LBPre
         initialActions?.forEach { send($0) }
     }
 
-    init(initialState: State, initialActions: [State.Action]? = nil, reducer: Reducer<State, NavState>, navState: NavState, navReducer: NavReducer<NavState>) {
+    public init(initialState: State, initialActions: [State.Action]? = nil, reducer: Reducer<State, NavState>, navState: NavState, navReducer: NavReducer<NavState>) {
         self.state = initialState
         self.reducer = reducer
         self.navState = navState
@@ -64,7 +64,7 @@ final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>: LBPre
         initialActions?.forEach { send($0) }
     }
 
-    func getChild<ChildState: Actionnable>(for state: ChildState, and reducer: Reducer<ChildState, NavState>) -> LBPresenter<ChildState, NavState> {
+    public func getChild<ChildState: Actionnable>(for state: ChildState, and reducer: Reducer<ChildState, NavState>) -> LBPresenter<ChildState, NavState> {
         let presenter: LBPresenter<ChildState, NavState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
         children.append(presenter)
         presenter.objectWillChange
@@ -78,7 +78,7 @@ final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>: LBPre
     /// Sends an action to the presenter, updating the state and potentially executing a side effect.
     ///
     /// - Parameter action: The action to process through the reducer.
-    func send(_ action: State.Action, _ transaction: Transaction? = nil) {
+    public func send(_ action: State.Action, _ transaction: Transaction? = nil) {
         // Handle the effect produced by the reducer.
         let effect: Effect<State.Action, NavState.Action> = withTransaction(transaction ?? .init()) { reducer(&state, action) }
         switch effect {
@@ -160,7 +160,7 @@ final class LBPresenter<State: Actionnable, NavState: FlowPresenterState>: LBPre
     ///   - value: The current value to be synchronized with the UI.
     ///   - action: A closure to convert the updated value into an action.
     /// - Returns: A `Binding` instance that connects the value and action.
-    func binding<Value>(for value: Value, send action: @escaping (Value) -> State.Action) -> Binding<Value> {
+    public func binding<Value>(for value: Value, send action: @escaping (Value) -> State.Action) -> Binding<Value> {
         Binding(
             get: { value },
             set: { [weak self] newValue, _ in
@@ -184,7 +184,7 @@ extension LBPresenter where NavState.Path == [NavState.Destination] {
     /// - Note:
     ///   This binding only reacts to changes in the last element of the collection.
     ///   The `action` is triggered only when the collection's `last` property is updated.
-    func bindPath(send action: @escaping (NavState.Path.Element?) -> NavState.Action) -> Binding<NavState.Path> {
+    public func bindPath(send action: @escaping (NavState.Path.Element?) -> NavState.Action) -> Binding<NavState.Path> {
         Binding(
             // The getter for the binding returns the current value of the collection.
             get: { self.navState.path },
@@ -259,7 +259,7 @@ extension View {
     ///   - presenter: The `LBPresenter` responsible for managing the state and sending actions.
     ///   - action: The action of type `State.Action` to send to the presenter when the task executes.
     /// - Returns: A view with the task attached.
-    func task<State: PresenterState, NavState: Actionnable>(_ presenter: LBPresenter<State, NavState>, action: State.Action) -> some View where State.Action: Sendable {
+    public func task<State: PresenterState, NavState: Actionnable>(_ presenter: LBPresenter<State, NavState>, action: State.Action) -> some View where State.Action: Sendable {
         // The `.task` modifier allows asynchronous code to run when the view appears.
         self.task {
             await presenter.send(action)
@@ -275,7 +275,7 @@ extension View {
     ///   - presenter: The `LBPresenter` responsible for managing the state and sending actions.
     ///   - action: The action of type `State.Action` to send to the presenter when the refresh is triggered.
     /// - Returns: A view with the refreshable behavior attached.
-    func refreshable<State: PresenterState, NavState: Actionnable>(_ presenter: LBPresenter<State, NavState>, action: State.Action) -> some View where State.Action: Sendable {
+    public func refreshable<State: PresenterState, NavState: Actionnable>(_ presenter: LBPresenter<State, NavState>, action: State.Action) -> some View where State.Action: Sendable {
         // The `.refreshable` modifier handles the pull-to-refresh gesture and executes asynchronous code.
         self.refreshable {
             await presenter.send(action)
@@ -285,12 +285,12 @@ extension View {
 
 // Extension to make the `Never` type conform to the `FlowPresenterState` protocol.
 extension Never: FlowPresenterState {
-    var path: Never {
+    public var path: Never {
         get { fatalError() }
         set {}
     }
 
-    typealias Path = Never
-    typealias Destination = Never
-    typealias Action = Never
+    public typealias Path = Never
+    public typealias Destination = Never
+    public typealias Action = Never
 }

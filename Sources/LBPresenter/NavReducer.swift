@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct NavReducer<NavState: Actionnable>: Sendable {
+public struct NavReducer<NavState: Actionnable>: Sendable {
     let navReducer: @Sendable (_ navState: inout NavState, _ action: NavState.Action) -> Void
 
-    init(navReduce: @escaping @Sendable (_ navState: inout NavState, _ action: NavState.Action) -> Void) {
+    public init(navReduce: @escaping @Sendable (_ navState: inout NavState, _ action: NavState.Action) -> Void) {
         self.navReducer = navReduce
     }
 
@@ -22,10 +22,10 @@ struct NavReducer<NavState: Actionnable>: Sendable {
     }
 }
 
-struct Reducer<State: Actionnable, NavState: Actionnable>: Sendable {
+public struct Reducer<State: Actionnable, NavState: Actionnable>: Sendable {
     let reducer: @Sendable (_ state: inout State, _ action: State.Action) -> Effect<State.Action, NavState.Action>
 
-    init(reduce: @escaping @Sendable (_ state: inout State, _ action: State.Action) -> Effect<State.Action, NavState.Action>) {
+    public init(reduce: @escaping @Sendable (_ state: inout State, _ action: State.Action) -> Effect<State.Action, NavState.Action>) {
         self.reducer = reduce
     }
 

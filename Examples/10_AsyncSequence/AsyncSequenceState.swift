@@ -8,6 +8,7 @@
 import Foundation
 import Combine
 import SwiftUI
+import LBPresenter
 
 struct AsyncSequenceState: PresenterState, Equatable {
     enum Action: Sendable, Equatable {

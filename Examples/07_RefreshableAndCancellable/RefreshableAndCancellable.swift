@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import LBPresenter
 
 struct RefreshableAndCancellable: View {
     @StateObject private var presenter: LBPresenter<RefreshableAndCancellableState, Never> = .init(initialState: .init(uiState: .data), reducer: RefreshableAndCancellableReducer.reducer)

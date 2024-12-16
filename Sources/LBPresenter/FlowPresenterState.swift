@@ -12,7 +12,7 @@ import Foundation
 ///
 /// Conforming types represent the current state of the application or feature
 /// and facilitate the handling of user or system-initiated actions.
-protocol FlowPresenterState: Actionnable {
+public protocol FlowPresenterState: Actionnable {
     associatedtype Path: Hashable
     associatedtype Destination
 
@@ -20,7 +20,7 @@ protocol FlowPresenterState: Actionnable {
 }
 
 extension FlowPresenterState where Path == [Destination] {
-    mutating func navigate(to destination: Destination?) {
+    public mutating func navigate(to destination: Destination?) {
         if let destination {
             path.append(destination)
         } else {
@@ -28,11 +28,11 @@ extension FlowPresenterState where Path == [Destination] {
         }
     }
 
-    mutating func pop() {
+    public mutating func pop() {
         path.removeLast()
     }
 
-    mutating func popToRoot() {
+    public mutating func popToRoot() {
         path.removeAll()
     }
 }

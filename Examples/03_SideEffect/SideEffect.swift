@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import LBPresenter
 
 struct SideEffect: View {
     @StateObject private var presenter: LBPresenter<SideEffectState, Never> = .init(initialState: .init(uiState: .data), reducer: SideEffectReducer.reducer)

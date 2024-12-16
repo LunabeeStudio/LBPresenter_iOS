@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import LBPresenter
 
 struct AsyncSequenceView: View {
     @StateObject private var presenter: LBPresenter<AsyncSequenceState, Never> = .init(initialState: .init(state: .loading), initialActions: [.startEmitter], reducer: AsyncSequenceReducer.reducer)

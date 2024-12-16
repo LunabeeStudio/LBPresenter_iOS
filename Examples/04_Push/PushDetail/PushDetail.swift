@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import LBPresenter
 
 struct PushDetail: View {
     @ObservedObject private var presenter: LBPresenter<PushDetailState, PushFlowState>

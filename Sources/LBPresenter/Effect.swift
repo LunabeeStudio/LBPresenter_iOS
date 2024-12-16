@@ -12,7 +12,7 @@ import SwiftUI
 /// - `none`: No side effect will be executed.
 /// - `run`: An asynchronous operation that can dispatch additional actions.
 /// - `cancel`: Cancels any currently running side effect associated with the reducer.
-enum Effect<Action, NavigationAction> {
+public enum Effect<Action, NavigationAction> {
 
     /// No side effect; the action only updates the state without triggering further behavior.
     case none
