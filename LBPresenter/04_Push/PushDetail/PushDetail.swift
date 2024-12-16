@@ -34,7 +34,7 @@ struct PushDetail: View {
                 .buttonStyle(.bordered)
 
                 Button {
-                    presenter.send(.back)
+                    presenter.send(.backToRoot)
                 } label: {
                     Text("popToRoot")
                 }
