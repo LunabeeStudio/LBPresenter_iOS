@@ -120,48 +120,82 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
     ///   - action: The action to process through the reducer.
     ///   - transaction: An optional `Transaction` to batch state changes with animations.
     public func send(_ action: State.Action, _ transaction: Transaction? = nil) {
-        // Process the action and obtain the resulting effect.
-        let effect: Effect<State.Action, NavState.Action> = withTransaction(transaction ?? .init()) {
-            reducer(&state, action)
-        }
-        handleEffect(effect)
-    }
-
-    /// Sends a navigation-specific action to the presenter.
-    ///
-    /// - Parameter navAction: The navigation action to process.
-    func send(navAction: NavState.Action) {
-        navReducer(&navState, navAction)
-    }
-
-    /// Handles the effect produced by the reducer.
-    ///
-    /// - Parameter effect: The effect to execute, such as running or canceling async operations.
-    private func handleEffect(_ effect: Effect<State.Action, NavState.Action>) {
+        // Handle the effect produced by the reducer.
+        let effect: Effect<State.Action, NavState.Action> = withTransaction(transaction ?? .init()) { reducer(&state, action) }
         switch effect {
         case .none:
             break
         case let .run(asyncFunc, cancelId):
             cancellationCancellables.cancel(id: cancelId)
             let task: Task<Void, Never> = Task { @MainActor in
-                await asyncFunc(
-                    .init(send: { [weak self] action, transaction in
+                await asyncFunc(.init(send: { [weak self] action, transaction in
+                    Task { @MainActor in
                         self?.send(action, transaction)
-                    }),
-                    .init(send: { [weak self] navAction, _ in
-                        self?.send(navAction: navAction)
-                    })
-                )
+                    }
+                }), .init(send: { [weak self] action, _ in
+                    Task { @MainActor in
+                        self?.sendNavigation(navAction: action)
+                    }
+                }))
             }
-            let cancellable = AnyCancellable { task.cancel() }
+            let cancellable: AnyCancellable = .init { task.cancel() }
             cancellationCancellables.insert(cancellable, at: cancelId)
             Task { @MainActor in
                 defer { cancellationCancellables.remove(cancellable, at: cancelId) }
-                _ = await task.result
+                // Wait for the task to finish and clean up after completion
+                _ = await task.result // Wait for the task to complete
             }
         case let .cancel(cancelId):
+            // Cancel the running effect task with the corresponding id.
             cancellationCancellables.cancel(id: cancelId)
         }
+    }
+
+    /// Sends an action to the presenter asynchronously, allowing the caller to await its completion.
+    ///
+    /// - Parameter action: The action to process through the reducer.
+    func send(_ action: State.Action, _ transaction: Transaction? = nil) async {
+        // Handle the effect produced by the reducer.
+        let effect: Effect<State.Action, NavState.Action> = withTransaction(transaction ?? .init()) { reducer(&state, action) }
+        switch effect {
+        case .none:
+            break
+        case let .run(asyncFunc, cancelId):
+            let myCancelId: String = cancelId ?? UUID().uuidString
+            await withTaskCancellationHandler {
+                cancellationCancellables.cancel(id: myCancelId)
+                let task: Task<Void, Never> = Task {
+                    await asyncFunc(.init(send: { [weak self] action, transaction in
+                        Task { @MainActor in
+                            self?.send(action, transaction)
+                        }
+                    }), .init(send: { [weak self] action, _ in
+                        Task { @MainActor in
+                            self?.sendNavigation(navAction: action)
+                        }
+                    }))
+                }
+                let cancellable: AnyCancellable = .init { task.cancel() }
+                cancellationCancellables.insert(cancellable, at: myCancelId)
+                defer { cancellationCancellables.remove(cancellable, at: myCancelId) }
+                // Wait for the task to finish and clean up after completion
+                _ = await task.result // Wait for the task to complete
+            } onCancel: {
+                Task { @MainActor in
+                    cancellationCancellables.cancel(id: myCancelId)
+                }
+            }
+        case let .cancel(cancelId):
+            // Cancel the running effect task with the corresponding id.
+            cancellationCancellables.cancel(id: cancelId)
+        }
+    }
+
+    /// Sends a navigation-specific action to the presenter.
+    ///
+    /// - Parameter navAction: The navigation action to process.
+    func sendNavigation(navAction: NavState.Action) {
+        navReducer(&navState, navAction)
     }
 
     /// Creates a binding to synchronize a value with the UI and propagate changes back as actions.

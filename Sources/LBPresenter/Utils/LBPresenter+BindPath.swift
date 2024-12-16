@@ -36,7 +36,7 @@ extension LBPresenter where NavState.Path == [NavState.Destination] {
                 if newValue.count < navState.path.count { destination = nil } // Handle "pop" operation
 
                 // Send the action corresponding to the updated last element.
-                self.send(navAction: action(destination))
+                self.sendNavigation(navAction: action(destination))
             }
         )
     }
