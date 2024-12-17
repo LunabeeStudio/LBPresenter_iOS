@@ -27,6 +27,6 @@ struct PushState: PresenterState {
     var uiState: UiState
 
     init() {
-        self.uiState = .ready(ReadyAction.self)
+        self.uiState = .ready
     }
 }
