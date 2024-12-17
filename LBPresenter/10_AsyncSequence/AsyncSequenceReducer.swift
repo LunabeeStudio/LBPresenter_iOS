@@ -8,7 +8,7 @@
 import Foundation
 
 struct AsyncSequenceReducer {
-    @MainActor static let reducer: Reducer<AsyncSequenceState, Never> = .init(reduce: { state, action in
+    @MainActor static let reducer: Reducer<AsyncSequenceState, Never> = .init(reduce: { state, action, _ in
         switch action {
         case .startEmitter:
             return .run { send, _  in

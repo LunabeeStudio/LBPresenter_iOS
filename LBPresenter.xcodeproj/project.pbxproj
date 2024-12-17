@@ -10,9 +10,51 @@
 		C83BF84B2CFDF10400873704 /* LBPresenter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBPresenter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C8A060A72D0C9A66003BD4BA /* Exceptions for "LBPresenter" folder in "LBPresenter" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				01_Simple/Simple.swift,
+				01_Simple/SimpleReducer.swift,
+				01_Simple/SimpleState.swift,
+				02_Action/Action.swift,
+				02_Action/ActionReducer.swift,
+				02_Action/ActionState.swift,
+				03_SideEffect/SideEffect.swift,
+				03_SideEffect/SideEffectReducer.swift,
+				03_SideEffect/SideEffectState.swift,
+				05_Present/Present.swift,
+				05_Present/PresentDetail.swift,
+				05_Present/PresentReducer.swift,
+				05_Present/PresentState.swift,
+				06_TextField/TextFieldDemo.swift,
+				06_TextField/TextFieldReducer.swift,
+				06_TextField/TextFieldState.swift,
+				07_RefreshableAndCancellable/RefreshableAndCancellable.swift,
+				07_RefreshableAndCancellable/RefreshableAndCancellableReducer.swift,
+				07_RefreshableAndCancellable/RefreshableAndCancellableState.swift,
+				08_Published/Published.swift,
+				08_Published/PublishedReducer.swift,
+				08_Published/PublishedState.swift,
+				08_Published/TimerUseCase.swift,
+				09_Form/FormDemo.swift,
+				09_Form/FormReducer.swift,
+				09_Form/FormState.swift,
+				10_AsyncSequence/AsyncSequenceReducer.swift,
+				10_AsyncSequence/AsyncSequenceState.swift,
+				10_AsyncSequence/AsyncSequenceView.swift,
+				10_AsyncSequence/TimerEmitter.swift,
+			);
+			target = C83BF84A2CFDF10400873704 /* LBPresenter */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C83BF84D2CFDF10400873704 /* LBPresenter */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C8A060A72D0C9A66003BD4BA /* Exceptions for "LBPresenter" folder in "LBPresenter" target */,
+			);
 			path = LBPresenter;
 			sourceTree = "<group>";
 		};

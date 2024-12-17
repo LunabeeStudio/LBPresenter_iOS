@@ -6,7 +6,7 @@
 //
 
 struct TextFieldReducer {
-    @MainActor static let reducer: Reducer<TextFieldState, Never> = .init(reduce: { state, action in
+    @MainActor static let reducer: Reducer<TextFieldState, Never> = .init(reduce: { state, action, _ in
         switch action {
         case .nameChanged(let name):
             switch state.uiState {

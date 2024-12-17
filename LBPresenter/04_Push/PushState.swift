@@ -8,18 +8,25 @@
 import Foundation
 import SwiftUI
 
-struct PushState: PresenterState, Equatable {
-    struct UiState: Equatable {
-        var isLoading: Bool
+struct PushState: PresenterState {
+    enum UiState {
+        case loading(LoadingAction.Type), ready(ReadyAction.Type)
+
+        static let loading: UiState = .loading(LoadingAction.self)
+        static let ready: UiState = .ready(ReadyAction.self)
     }
 
-    enum Action: Sendable, Equatable {
+    enum LoadingAction: Actionning, Equatable {
+        case cancelLoading
+    }
+
+    enum ReadyAction: Actionning, Equatable {
         case delayNavigate(PushDetailModel), removeLoading, pushDetail
     }
 
     var uiState: UiState
 
-    init(uiState: UiState) {
-        self.uiState = uiState
+    init() {
+        self.uiState = .ready(ReadyAction.self)
     }
 }

@@ -11,7 +11,7 @@ import SwiftUI
 struct PushFlowState: FlowPresenterState, Equatable {
     typealias Path = [Destination]
     
-    enum Action: Sendable, Equatable {
+    enum Action: Actionning, Equatable {
         case navigate(Destination?), pop, popToRoot
     }
 

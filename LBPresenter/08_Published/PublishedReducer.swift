@@ -11,7 +11,7 @@ import Combine
 struct PublishedReducer {
     nonisolated(unsafe) static var cancellables: Set<AnyCancellable> = []
 
-    static let reducer: Reducer<PublishedState, Never> = .init(reduce: { state, action in
+    static let reducer: Reducer<PublishedState, Never> = .init(reduce: { state, action, _ in
         switch action {
         case .startTimer:
             state.uiState = .loading

@@ -6,7 +6,7 @@
 //
 
 struct ActionReducer {
-    @MainActor static let reducer: Reducer<ActionState, Never> = .init(reduce: { state, action in
+    @MainActor static let reducer: Reducer<ActionState, Never> = .init(reduce: { state, action, _ in
         switch action {
         case .increment:
             state.uiState.count += 1

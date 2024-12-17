@@ -10,7 +10,7 @@ import Foundation
 struct FormReducer {
     private enum CancelID: String { case bouncing }
 
-    @MainActor static let reducer: Reducer<FormState, Never> = .init(reduce: { state, action in
+    @MainActor static let reducer: Reducer<FormState, Never> = .init(reduce: { state, action, _ in
         switch action {
         case .nameChanged(let name):
             if name != state.uiState.formData.name {

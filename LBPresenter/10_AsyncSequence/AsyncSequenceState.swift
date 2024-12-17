@@ -10,7 +10,7 @@ import Combine
 import SwiftUI
 
 struct AsyncSequenceState: PresenterState, Equatable {
-    enum Action: Sendable, Equatable {
+    enum Action: Actionning, Equatable {
         case startEmitter, startObserve, didReceiveData(Date)
     }
 

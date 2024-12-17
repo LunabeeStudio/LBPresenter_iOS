@@ -6,7 +6,7 @@
 //
 
 struct SideEffectReducer {
-    @MainActor static let reducer: Reducer<SideEffectState, Never> = .init(reduce: { state, action in
+    @MainActor static let reducer: Reducer<SideEffectState, Never> = .init(reduce: { state, action, _ in
         switch action {
         case .showLoadingThenData:
             state.uiState = .loading

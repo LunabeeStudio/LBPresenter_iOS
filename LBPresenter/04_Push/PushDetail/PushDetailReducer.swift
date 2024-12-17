@@ -6,7 +6,8 @@
 //
 
 struct PushDetailReducer {
-    @MainActor static let reducer: Reducer<PushDetailState, PushFlowState> = .init(reduce: { state, action in
+    @MainActor static let reducer: Reducer<PushDetailState, PushFlowState> = .init(reduce: { state, action, send in
+        guard let action = action as? PushDetailState.Action else { return .none }
         switch action {
             case .back:
                 return .run { _, sendNavigation in

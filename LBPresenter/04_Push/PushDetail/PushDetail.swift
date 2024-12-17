@@ -16,31 +16,34 @@ struct PushDetail: View {
 
     var body: some View {
         let _ = Self._printChanges()
-        List {
-            VStack {
-                Text(presenter.state.uiState.modelId ?? "")
-                Button {
-                    presenter.send(.back)
-                } label: {
-                    Text("Back")
-                }
-                .buttonStyle(.bordered)
+        switch presenter.state.uiState {
+        case let .ready(modelId, actionType):
+            List {
+                VStack {
+                    Text("\(modelId)")
+                    Button {
+                        presenter.send(actionType.back)
+                    } label: {
+                        Text("Back")
+                    }
+                    .buttonStyle(.bordered)
 
-                Button {
-                    presenter.send(.pushDetail)
-                } label: {
-                    Text("push")
-                }
-                .buttonStyle(.bordered)
+                    Button {
+                        presenter.send(actionType.pushDetail)
+                    } label: {
+                        Text("push")
+                    }
+                    .buttonStyle(.bordered)
 
-                Button {
-                    presenter.send(.back)
-                } label: {
-                    Text("popToRoot")
+                    Button {
+                        presenter.send(actionType.backToRoot)
+                    } label: {
+                        Text("popToRoot")
+                    }
+                    .buttonStyle(.bordered)
                 }
-                .buttonStyle(.bordered)
+                .padding()
             }
-            .padding()
         }
     }
 }
