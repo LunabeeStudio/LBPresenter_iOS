@@ -10,17 +10,18 @@ import SwiftUI
 import LBPresenter
 
 struct PushDetailState: PresenterState {
-    struct UiState: Equatable {
-        var modelId : String?
+    enum UiState: Equatable {
+        case idle, data(String)
     }
 
     enum Action: Sendable {
-        case back, backToRoot, pushDetail
+        case back, backToRoot, pushDetail, moveToData, setData
     }
 
-    var uiState: UiState
+    var uiState: UiState = .idle
+    var modelId: String
 
     init(modelId: String) {
-        self.uiState = .init(modelId: modelId)
+        self.modelId = modelId
     }
 }

@@ -21,9 +21,8 @@ public protocol LBPresenterProtocol: ObservableObject {}
 /// Conforms to `LBPresenterProtocol` and is designed to work seamlessly with SwiftUI's `ObservableObject` system.
 @MainActor
 public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>: LBPresenterProtocol {
-
     /// A collection of child presenters for managing nested state and logic.
-    var children: [any LBPresenterProtocol] = []
+    var children: [NavState.Path: any LBPresenterProtocol] = [:]
 
     /// The current state of the presenter, published to notify SwiftUI views of changes.
     ///
@@ -104,7 +103,7 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
         and reducer: Reducer<ChildState, NavState>
     ) -> LBPresenter<ChildState, NavState> {
         let presenter: LBPresenter<ChildState, NavState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
-        children.append(presenter)
+        children[navState.path] = presenter
         presenter.objectWillChange
             .sink { [weak self] _ in
                 // Update navigation state when a child presenter changes.
