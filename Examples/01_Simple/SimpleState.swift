@@ -14,7 +14,7 @@ struct SimpleState: PresenterState, Equatable {
     enum UiState: Equatable {
         case data
     }
-    enum Action: Sendable, Equatable {}
+    enum Action: Actionning {}
 
     var uiState: UiState
 

@@ -19,7 +19,7 @@ import Foundation
 /// ## Associated Types:
 /// - `Path`: A type that represents the navigation path. This can be a stack (`[Destination]`) or a single value (`Destination?`).
 /// - `Destination`: A type that represents a specific navigation target.
-public protocol NavPresenterState: Actionnable {
+public protocol NavPresenterState: Actionnable, Equatable {
     /// The type representing the navigation path. Typically:
     /// - `[Destination]` for stack-based navigation.
     /// - `Destination?` for single-destination navigation.
@@ -33,7 +33,6 @@ public protocol NavPresenterState: Actionnable {
 }
 
 // MARK: - Extensions for Stack-Based Navigation
-
 extension NavPresenterState where Path == [Destination] {
     /// Navigates to a specific destination or pops the current path if the destination is `nil`.
     ///
@@ -58,7 +57,6 @@ extension NavPresenterState where Path == [Destination] {
 }
 
 // MARK: - Extensions for Single-Destination Navigation
-
 extension NavPresenterState where Path == Destination? {
     /// Sets the navigation path to the specified destination or clears it if `nil`.
     ///

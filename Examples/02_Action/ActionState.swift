@@ -14,7 +14,7 @@ struct ActionState: PresenterState, Equatable {
     struct UiState: Equatable {
         var count: Int
     }
-    enum Action: Sendable, Equatable {
+    enum Action: Actionning {
         case increment, decrement
     }
 

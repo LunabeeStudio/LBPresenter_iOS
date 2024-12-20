@@ -16,7 +16,7 @@ struct PublishedState: PresenterState, Equatable {
         case loading, data(timer: Date?)
     }
     
-    enum Action: Sendable, Equatable {
+    enum Action: Actionning {
         case startTimer, startObserve, showData, timerDidUpdate(Date), stopObserve, stopTimer
     }
 

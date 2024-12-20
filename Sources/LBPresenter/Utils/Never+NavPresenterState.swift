@@ -34,3 +34,5 @@ extension Never: NavPresenterState {
     // as actions are not applicable for `Never`.
     public typealias Action = Never
 }
+
+extension Never: Actionning {}

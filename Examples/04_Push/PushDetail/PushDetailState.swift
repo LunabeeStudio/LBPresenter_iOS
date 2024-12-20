@@ -14,7 +14,7 @@ struct PushDetailState: PresenterState {
         case idle, data(String)
     }
 
-    enum Action: Sendable {
+    enum Action: Actionning {
         case back, backToRoot, pushDetail, moveToData, setData
     }
 

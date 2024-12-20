@@ -11,6 +11,13 @@ import Foundation
 
 public protocol LBPresenterProtocol: ObservableObject {}
 
+@MainActor
+protocol LBNavPresenter: LBPresenterProtocol {
+    func sendNavigation(navAction: any Actionning)
+}
+
+public protocol Actionning: Sendable, Equatable {}
+
 /// A generic presenter that manages state, navigation, and effects for a SwiftUI view using a reducer pattern.
 ///
 /// The presenter:
@@ -20,9 +27,10 @@ public protocol LBPresenterProtocol: ObservableObject {}
 ///
 /// Conforms to `LBPresenterProtocol` and is designed to work seamlessly with SwiftUI's `ObservableObject` system.
 @MainActor
-public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>: LBPresenterProtocol {
+public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>: LBNavPresenter {
     /// A collection of child presenters for managing nested state and logic.
     var children: [NavState.Path: any LBPresenterProtocol] = [:]
+    private weak var parent: (any LBNavPresenter)?
 
     /// The current state of the presenter, published to notify SwiftUI views of changes.
     ///
@@ -54,9 +62,6 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
 
     /// A collection to manage cancellable async operations tied to effect execution.
     private let cancellationCancellables: CancellablesCollection = .init()
-
-    /// A set of cancellables used for managing Combine subscriptions.
-    private var cancellables: Set<AnyCancellable> = []
 
     // MARK: - Initializers
 
@@ -102,15 +107,18 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
         for state: ChildState,
         and reducer: Reducer<ChildState, NavState>
     ) -> LBPresenter<ChildState, NavState> {
-        let presenter: LBPresenter<ChildState, NavState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
-        children[navState.path] = presenter
-        presenter.objectWillChange
-            .sink { [weak self] _ in
-                // Update navigation state when a child presenter changes.
-                self?.navState = presenter.navState
-            }
-            .store(in: &cancellables)
-        return presenter
+        let presenterToReturn: LBPresenter<ChildState, NavState>
+
+        if let presenter = children[navState.path] as? LBPresenter<ChildState, NavState> {
+            presenterToReturn = presenter
+        } else {
+            let presenter: LBPresenter<ChildState, NavState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
+            presenter.parent = self
+            children[navState.path] = presenter
+            presenterToReturn = presenter
+        }
+
+        return presenterToReturn
     }
 
     /// Sends an action to the presenter, triggering state updates and effects.
@@ -193,8 +201,13 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
     /// Sends a navigation-specific action to the presenter.
     ///
     /// - Parameter navAction: The navigation action to process.
-    func sendNavigation(navAction: NavState.Action) {
-        navReducer(&navState, navAction)
+    func sendNavigation(navAction: any Actionning) {
+        let previousPath: NavState.Path = navState.path
+        if let parent {
+            parent.sendNavigation(navAction: navAction)
+        } else {
+            navReducer(&navState, navAction)
+        }
     }
 
     /// Creates a binding to synchronize a value with the UI and propagate changes back as actions.

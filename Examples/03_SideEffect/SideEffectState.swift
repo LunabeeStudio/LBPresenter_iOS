@@ -14,7 +14,7 @@ struct SideEffectState: PresenterState, Equatable {
         case loading, data, error
     }
 
-    enum Action: Sendable, Equatable {
+    enum Action: Actionning {
         case showLoadingThenData, showLoadingThenError, showData, showError
     }
 

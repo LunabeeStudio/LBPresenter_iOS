@@ -12,7 +12,7 @@ import LBPresenter
 struct PushFlowState: NavPresenterState, Equatable {
     typealias Path = [Destination]
     
-    enum Action: Sendable, Equatable {
+    enum Action: Actionning {
         case navigate(Destination?), pop, popToRoot
     }
 

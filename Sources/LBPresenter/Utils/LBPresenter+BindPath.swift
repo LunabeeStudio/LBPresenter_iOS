@@ -33,7 +33,9 @@ extension LBPresenter where NavState.Path == [NavState.Destination] {
 
                 // Determine the last element of the updated path, or nil if the path was shortened.
                 var destination: NavState.Path.Element? = newValue.last
-                if newValue.count < navState.path.count { destination = nil } // Handle "pop" operation
+                if newValue.count < navState.path.count {
+                    destination = nil
+                } // Handle "pop" operation
 
                 // Send the action corresponding to the updated last element.
                 self.sendNavigation(navAction: action(destination))

@@ -23,13 +23,13 @@ public struct NavReducer<NavState: Actionnable>: Sendable {
     ///
     /// This closure mutates the navigation state (`NavState`) based on the received action (`NavState.Action`),
     /// implementing the logic for transitions such as navigating to a destination, popping a screen, or resetting the stack.
-    let navReducer: @Sendable (_ navState: inout NavState, _ action: NavState.Action) -> Void
+    let navReducer: @Sendable (_ navState: inout NavState, _ action: any Actionning) -> Void
 
     /// Initializes a `NavReducer` with a custom state mutation logic.
     ///
     /// - Parameter navReduce: A closure defining the reducer logic for updating the navigation state
     ///   in response to a specific navigation action.
-    public init(navReduce: @escaping @Sendable (_ navState: inout NavState, _ action: NavState.Action) -> Void) {
+    public init(navReduce: @escaping @Sendable (_ navState: inout NavState, _ action: any Actionning) -> Void) {
         self.navReducer = navReduce
     }
 
@@ -41,7 +41,7 @@ public struct NavReducer<NavState: Actionnable>: Sendable {
     /// - Parameters:
     ///   - navState: The current navigation state to be mutated.
     ///   - action: The navigation action that triggers a state update.
-    func callAsFunction(_ navState: inout NavState, _ action: NavState.Action) {
+    func callAsFunction(_ navState: inout NavState, _ action: any Actionning) {
         self.navReducer(&navState, action)
     }
 }

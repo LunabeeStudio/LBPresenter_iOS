@@ -11,10 +11,6 @@ import LBPresenter
 struct PushDetail: View {
     @ObservedObject var presenter: LBPresenter<PushDetailState, PushFlowState>
 
-//    init(presenter: LBPresenter<PushDetailState, PushFlowState>) {
-//        self.presenter = presenter
-//    }
-
     var body: some View {
         let _ = Self._printChanges()
         List {
