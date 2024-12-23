@@ -9,19 +9,8 @@ import Foundation
 import SwiftUI
 import LBPresenter
 
-struct PushFlowState: NavPresenterState, Equatable {
-
-    enum Action: Actionning {
-        case navigate(Destination?), pop, popToRoot
-    }
-
-    enum Destination: Equatable, Hashable {
-        case detail(PushDetailModel)
-    }
-
-    var path: [Destination]
-
-    init(path: [Destination] = []) {
-        self.path = path
-    }
+enum PushDestination: Hashable, Equatable, Sendable {
+    case detail(PushDetailModel)
 }
+
+typealias PushFlowState = DefaultNavPresenterState<PushDestination>
