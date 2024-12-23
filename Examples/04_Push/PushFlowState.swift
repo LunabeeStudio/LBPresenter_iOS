@@ -10,8 +10,7 @@ import SwiftUI
 import LBPresenter
 
 struct PushFlowState: NavPresenterState, Equatable {
-    typealias Path = [Destination]
-    
+
     enum Action: Actionning {
         case navigate(Destination?), pop, popToRoot
     }
@@ -20,9 +19,9 @@ struct PushFlowState: NavPresenterState, Equatable {
         case detail(PushDetailModel)
     }
 
-    var path: Path
+    var path: [Destination]
 
-    init(path: Path = []) {
+    init(path: [Destination] = []) {
         self.path = path
     }
 }

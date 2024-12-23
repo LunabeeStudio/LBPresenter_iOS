@@ -17,14 +17,10 @@
 extension Never: NavPresenterState {
     // Conformance to the `NavPresenterState` protocol.
     // Accessing or setting `path` will cause a runtime error, as `Never` cannot have a value.
-    public var path: Never {
+    public var path: [Never] {
         get { fatalError() }
         set {}
     }
-
-    // The type representing the navigation path. Since `Never` is uninhabited,
-    // this type alias resolves to `Never` itself.
-    public typealias Path = Never
 
     // The type representing navigation destinations. This resolves to `Never`,
     // as destinations are irrelevant for `Never`.

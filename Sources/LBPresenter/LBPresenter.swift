@@ -51,6 +51,20 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
         didSet {
             // Notify subscribers when navigation state changes.
             objectWillChange.send()
+
+            var validDestinations: [NavState.Path] = [navState.path]
+            var subDestinations = navState.path
+
+            // Generate all sub-paths by successively removing the last element
+            while !subDestinations.isEmpty {
+                subDestinations.removeLast()
+                validDestinations.append(subDestinations)
+            }
+
+            // Filter the `children` dictionary
+            children = children.filter { key, _ in
+                validDestinations.contains(key)
+            }
         }
     }
 
