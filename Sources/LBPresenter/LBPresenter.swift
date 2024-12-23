@@ -29,7 +29,16 @@ public protocol Actionning: Sendable, Equatable {}
 @MainActor
 public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>: LBNavPresenter {
     /// A collection of child presenters for managing nested state and logic.
-    var children: [NavState.Path: any LBPresenterProtocol] = [:]
+    ///
+    /// Each child is uniquely identified by a `UUID` and is associated with a specific navigation path.
+    /// This allows efficient tracking of child presenters, ensuring they can be updated or removed
+    /// based on changes to the navigation state.
+    var children: [UUID: (path: NavState.Path, presenter: any LBPresenterProtocol)] = [:]
+
+    /// A reference to the parent presenter, used to manage hierarchical navigation flows.
+    ///
+    /// The parent presenter can coordinate with its children to handle actions or propagate state changes.
+    /// This is weak to avoid strong reference cycles.
     private weak var parent: (any LBNavPresenter)?
 
     /// The current state of the presenter, published to notify SwiftUI views of changes.
@@ -43,10 +52,12 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
         }
     }
 
-    /// The navigation state managed by the presenter.
+    /// The navigation state managed by this presenter.
     ///
-    /// This is used for handling navigation-specific logic. It is force-unwrapped to ensure
-    /// initialization when needed.
+    /// This state encapsulates the current navigation path and any associated logic.
+    /// The `navState` is force-unwrapped because it must be initialized before use.
+    /// When the state changes, subscribers are notified, and child presenters are updated or removed
+    /// based on the validity of their associated paths.
     private(set) var navState: NavState! {
         didSet {
             // Notify subscribers when navigation state changes.
@@ -62,8 +73,8 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
             }
 
             // Filter the `children` dictionary
-            children = children.filter { key, _ in
-                validDestinations.contains(key)
+            children = children.filter { key, value in
+                validDestinations.contains(value.path)
             }
         }
     }
@@ -113,22 +124,28 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
 
     /// Retrieves or creates a child presenter to manage nested state and actions.
     ///
+    /// This function either fetches an existing child presenter associated with the provided `uniqueId`
+    /// or creates a new one if none exists. The child presenter is associated with the current navigation path
+    /// and stored in the `children` collection.
+    ///
     /// - Parameters:
-    ///   - state: The state for the child presenter.
-    ///   - reducer: The reducer function for the child presenter.
-    /// - Returns: A configured child presenter instance.
+    ///   - state: The initial state to be managed by the child presenter.
+    ///   - reducer: The reducer function that defines how the child presenter will handle state changes.
+    ///   - uniqueId: A unique identifier to associate the child presenter with this navigation flow.
+    /// - Returns: A configured child presenter instance that manages the given `state` and responds to the `reducer`.
     public func getChild<ChildState: Actionnable>(
         for state: ChildState,
-        and reducer: Reducer<ChildState, NavState>
+        and reducer: Reducer<ChildState, NavState>,
+        bindTo uniqueId: UUID
     ) -> LBPresenter<ChildState, NavState> {
         let presenterToReturn: LBPresenter<ChildState, NavState>
 
-        if let presenter = children[navState.path] as? LBPresenter<ChildState, NavState> {
+        if let presenter = children[uniqueId]?.presenter as? LBPresenter<ChildState, NavState> {
             presenterToReturn = presenter
         } else {
             let presenter: LBPresenter<ChildState, NavState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
             presenter.parent = self
-            children[navState.path] = presenter
+            children[uniqueId] = (navState.path, presenter)
             presenterToReturn = presenter
         }
 

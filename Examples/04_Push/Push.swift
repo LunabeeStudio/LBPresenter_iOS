@@ -67,8 +67,8 @@ struct Push: View {
             }
             .navigationDestination(for: PushFlowState.Destination.self) { destination in
                 switch destination {
-                case let .detail(model):
-                    PushDetail(presenter: presenter.getChild(for: .init(modelId: model.id), and: PushDetailReducer.reducer))
+                case let .detail(uuid, model):
+                    PushDetail(presenter: presenter.getChild(for: .init(modelId: model.id), and: PushDetailReducer.reducer, bindTo: uuid))
                 }
             }
         }

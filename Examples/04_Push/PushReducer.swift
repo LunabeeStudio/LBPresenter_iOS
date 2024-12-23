@@ -13,11 +13,11 @@ struct PushReducer {
         case .removeLoading:
             state.uiState.isLoading = false
             return .run { _, sendNavigation in
-                sendNavigation(.navigate(.detail(PushDetailModel(id: "pushed with delay"))))
+                sendNavigation(.navigate(.detail(.init(), PushDetailModel(id: "pushed with delay"))))
             }
         case .pushDetail:
             return .run { _, sendNavigation in
-                sendNavigation(.navigate(.detail(.init(id: "pushed"))))
+                sendNavigation(.navigate(.detail(.init(), .init(id: "pushed"))))
             }
         case let .delayNavigate(model):
             state.uiState.isLoading = true

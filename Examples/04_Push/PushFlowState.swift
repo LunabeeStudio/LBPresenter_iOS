@@ -10,7 +10,7 @@ import SwiftUI
 import LBPresenter
 
 enum PushDestination: Hashable, Equatable, Sendable {
-    case detail(PushDetailModel)
+    case detail(UUID, PushDetailModel)
 }
 
 typealias PushFlowState = DefaultNavPresenterState<PushDestination>
