@@ -11,6 +11,7 @@
 		9399099D2D106293002DB499 /* DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 939909952D106293002DB499 /* DemoApp.swift */; };
 		939909BB2D106293002DB499 /* Demo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 939909942D106293002DB499 /* Demo.swift */; };
 		939909C52D106373002DB499 /* LBPresenter in Frameworks */ = {isa = PBXBuildFile; productRef = 939909C42D106373002DB499 /* LBPresenter */; };
+		93990D9A2D141A6C002DB499 /* LBPresenter in Resources */ = {isa = PBXBuildFile; fileRef = 93990D992D141A6C002DB499 /* LBPresenter */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,6 +32,7 @@
 		939909942D106293002DB499 /* Demo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Demo.swift; sourceTree = "<group>"; };
 		939909952D106293002DB499 /* DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoApp.swift; sourceTree = "<group>"; };
 		939909962D106293002DB499 /* LBPresenter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LBPresenter.entitlements; sourceTree = "<group>"; };
+		93990D992D141A6C002DB499 /* LBPresenter */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = LBPresenter; path = ../../LBPresenter_iOS; sourceTree = SOURCE_ROOT; };
 		C83BF84B2CFDF10400873704 /* Examples.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Examples.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -112,6 +114,7 @@
 		C83BF8422CFDF10400873704 = {
 			isa = PBXGroup;
 			children = (
+				93990D992D141A6C002DB499 /* LBPresenter */,
 				93990AF92D109D5F002DB499 /* internal */,
 				939909652D106293002DB499 /* 01_Simple */,
 				939909692D106293002DB499 /* 02_Action */,
@@ -203,7 +206,6 @@
 			mainGroup = C83BF8422CFDF10400873704;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				939909C32D106373002DB499 /* XCLocalSwiftPackageReference "../../LBPresenter_iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C83BF84C2CFDF10400873704 /* Products */;
@@ -220,6 +222,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93990D9A2D141A6C002DB499 /* LBPresenter in Resources */,
 				939909992D106293002DB499 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -457,13 +460,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCLocalSwiftPackageReference section */
-		939909C32D106373002DB499 /* XCLocalSwiftPackageReference "../../LBPresenter_iOS" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../LBPresenter_iOS;
-		};
-/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		939909C42D106373002DB499 /* LBPresenter */ = {
