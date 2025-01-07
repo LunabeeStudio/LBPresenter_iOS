@@ -8,7 +8,7 @@
 import SwiftUI
 
 public extension View {
-    func navigationDestination<T: Hashable & Sendable>(destination: @escaping (T, UUID) -> some View) -> some View {
+    func navigationDestination<T: Hashable & Sendable>(@ViewBuilder destination: @escaping (T, UUID) -> some View) -> some View {
         self.navigationDestination(for: Destinable<T>.self) { destinable in
             destination(destinable.destination, destinable.uniqueId)
         }
