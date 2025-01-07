@@ -22,9 +22,9 @@ import Foundation
 public protocol NavPresenterState: Actionnable, Equatable {
 
     /// The type representing a specific navigation target or screen.
-    associatedtype Destination: Hashable
+    associatedtype Destination: Hashable & Sendable
 
-    typealias Path = [Destination]
+    typealias Path = [Destinable<Destination>]
 
     /// The navigation path, which defines the current state of navigation.
     var path: Path { get set }
@@ -37,7 +37,8 @@ extension NavPresenterState {
     /// - Parameter destination: The destination to navigate to. If `nil`, the method will pop the current path.
     public mutating func navigate(to destination: Destination?) {
         if let destination {
-            path.append(destination) // Push the destination onto the navigation stack.
+            let destinable: Destinable = .init(destination: destination)
+            path.append(destinable) // Push the destination onto the navigation stack.
         } else {
             pop() // Pop the current destination if `nil` is provided.
         }

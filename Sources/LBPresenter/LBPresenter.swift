@@ -33,7 +33,7 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
     /// Each child is uniquely identified by a `UUID` and is associated with a specific navigation path.
     /// This allows efficient tracking of child presenters, ensuring they can be updated or removed
     /// based on changes to the navigation state.
-    var children: [UUID: (path: NavState.Path, presenter: any LBPresenterProtocol)] = [:]
+    var children: [UUID: any LBPresenterProtocol] = [:]
 
     /// A reference to the parent presenter, used to manage hierarchical navigation flows.
     ///
@@ -57,25 +57,20 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
     /// This state encapsulates the current navigation path and any associated logic.
     /// The `navState` is force-unwrapped because it must be initialized before use.
     /// When the state changes, subscribers are notified, and child presenters are updated or removed
-    /// based on the validity of their associated paths.
+    /// based on the presence of the UUID in the new value.
     private(set) var navState: NavState! {
         didSet {
             // Notify subscribers when navigation state changes.
             objectWillChange.send()
 
-            var validDestinations: [NavState.Path] = [navState.path]
-            var subDestinations = navState.path
+            let oldDestinations = Set(oldValue.path.compactMap { $0.uniqueId })
+            let newDestinations = Set(navState.path.compactMap { $0.uniqueId })
 
-            // Generate all sub-paths by successively removing the last element
-            while !subDestinations.isEmpty {
-                subDestinations.removeLast()
-                validDestinations.append(subDestinations)
+            oldDestinations.subtracting(newDestinations).forEach { uuid in
+                children.removeValue(forKey: uuid)
             }
 
-            // Filter the `children` dictionary
-            children = children.filter { key, value in
-                validDestinations.contains(value.path)
-            }
+            print("****** Children =====> \(children.keys)")
         }
     }
 
@@ -140,12 +135,12 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
     ) -> LBPresenter<ChildState, NavState> {
         let presenterToReturn: LBPresenter<ChildState, NavState>
 
-        if let presenter = children[uniqueId]?.presenter as? LBPresenter<ChildState, NavState> {
+        if let presenter = children[uniqueId] as? LBPresenter<ChildState, NavState> {
             presenterToReturn = presenter
         } else {
             let presenter: LBPresenter<ChildState, NavState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
             presenter.parent = self
-            children[uniqueId] = (navState.path, presenter)
+            children[uniqueId] = presenter
             presenterToReturn = presenter
         }
 

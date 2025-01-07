@@ -5,15 +5,14 @@
 //  Created by Q2 on 23/12/2024.
 //
 
-public struct DefaultNavPresenterState<Destination: Hashable & Equatable & Sendable>: NavPresenterState, Equatable {
-
+public struct DefaultNavPresenterState<Destination: Hashable & Sendable>: NavPresenterState, Equatable {
     public enum Action: Actionning {
         case navigate(Destination?), pop, popToRoot
     }
 
-    public var path: [Destination]
+    public var path: [Destinable<Destination>]
 
-    public init(path: [Destination] = []) {
+    public init(path: [Destinable<Destination>] = []) {
         self.path = path
     }
 

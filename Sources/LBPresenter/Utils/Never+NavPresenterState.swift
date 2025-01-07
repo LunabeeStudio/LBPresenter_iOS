@@ -5,6 +5,8 @@
 //  Created by Q2 on 16/12/2024.
 //
 
+import Foundation
+
 // Extends the `Never` type to conform to the `NavPresenterState` protocol.
 //
 // This extension allows `Never` to be used as a placeholder for cases where
@@ -17,7 +19,7 @@
 extension Never: NavPresenterState {
     // Conformance to the `NavPresenterState` protocol.
     // Accessing or setting `path` will cause a runtime error, as `Never` cannot have a value.
-    public var path: [Never] {
+    public var path: [Destinable<Never>] {
         get { fatalError() }
         set {}
     }

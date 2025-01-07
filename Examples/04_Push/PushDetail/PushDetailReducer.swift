@@ -16,7 +16,7 @@ struct PushDetailReducer {
             }
         case .pushDetail:
             return .run { _, sendNavigation in
-                sendNavigation(.navigate(.detail(.init(), .init(id: "mi-push mi-scorpion et re mi-push derrière"))))
+                sendNavigation(.navigate(.detail(.init(id: "mi-push mi-scorpion et re mi-push derrière"))))
             }
         case .backToRoot:
             return .run { _, sendNavigation in
