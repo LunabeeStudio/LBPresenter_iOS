@@ -37,6 +37,8 @@ public enum Effect<Action, NavigationAction> {
         cancelId: String? = nil
     )
 
+    case dismiss
+
     /// Cancels an ongoing side effect associated with a specific `cancelId`.
     ///
     /// This effect is used to terminate long-running or obsolete tasks, ensuring they do not

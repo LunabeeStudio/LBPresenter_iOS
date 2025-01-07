@@ -22,4 +22,5 @@ public protocol Actionnable {
     /// trigger side effects. For example, they may represent user inputs,
     /// API requests, or navigation commands.
     associatedtype Action: Actionning
+    mutating func dismiss()
 }

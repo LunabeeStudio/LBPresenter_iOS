@@ -9,17 +9,19 @@ import Foundation
 import SwiftUI
 import LBPresenter
 
-struct PresentState: PresenterState, Equatable {
+struct PresentState: SheetPresenterState, Equatable {
+    typealias Sheet = PresentDetailModel
 
     enum UiState: Equatable {
-        case data(PresentDetailModel?)
+        case data
     }
 
     enum Action: Actionning {
-        case present(PresentDetailModel?)
+        case present(Sheet?)
     }
 
     var uiState: UiState
+    var presented: Sheet?
 
     init(uiState: UiState) {
         self.uiState = uiState
