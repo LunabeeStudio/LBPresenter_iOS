@@ -11,6 +11,13 @@ import Foundation
 
 public protocol LBPresenterProtocol: ObservableObject {}
 
+@MainActor
+protocol LBNavPresenter: LBPresenterProtocol {
+    func sendNavigation(navAction: any Actionning)
+}
+
+public protocol Actionning: Sendable, Equatable {}
+
 /// A generic presenter that manages state, navigation, and effects for a SwiftUI view using a reducer pattern.
 ///
 /// The presenter:
@@ -20,10 +27,19 @@ public protocol LBPresenterProtocol: ObservableObject {}
 ///
 /// Conforms to `LBPresenterProtocol` and is designed to work seamlessly with SwiftUI's `ObservableObject` system.
 @MainActor
-public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>: LBPresenterProtocol {
-
+public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>: LBNavPresenter {
     /// A collection of child presenters for managing nested state and logic.
-    var children: [any LBPresenterProtocol] = []
+    ///
+    /// Each child is uniquely identified by a `UUID` and is associated with a specific navigation path.
+    /// This allows efficient tracking of child presenters, ensuring they can be updated or removed
+    /// based on changes to the navigation state.
+    var children: [UUID: any LBPresenterProtocol] = [:]
+
+    /// A reference to the parent presenter, used to manage hierarchical navigation flows.
+    ///
+    /// The parent presenter can coordinate with its children to handle actions or propagate state changes.
+    /// This is weak to avoid strong reference cycles.
+    private weak var parent: (any LBNavPresenter)?
 
     /// The current state of the presenter, published to notify SwiftUI views of changes.
     ///
@@ -36,14 +52,25 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
         }
     }
 
-    /// The navigation state managed by the presenter.
+    /// The navigation state managed by this presenter.
     ///
-    /// This is used for handling navigation-specific logic. It is force-unwrapped to ensure
-    /// initialization when needed.
+    /// This state encapsulates the current navigation path and any associated logic.
+    /// The `navState` is force-unwrapped because it must be initialized before use.
+    /// When the state changes, subscribers are notified, and child presenters are updated or removed
+    /// based on the presence of the UUID in the new value.
     private(set) var navState: NavState! {
         didSet {
             // Notify subscribers when navigation state changes.
             objectWillChange.send()
+
+            let oldDestinations = Set(oldValue.path.compactMap { $0.uniqueId })
+            let newDestinations = Set(navState.path.compactMap { $0.uniqueId })
+
+            oldDestinations.subtracting(newDestinations).forEach { uuid in
+                children.removeValue(forKey: uuid)
+            }
+
+            print("****** Children =====> \(children.keys)")
         }
     }
 
@@ -55,9 +82,6 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
 
     /// A collection to manage cancellable async operations tied to effect execution.
     private let cancellationCancellables: CancellablesCollection = .init()
-
-    /// A set of cancellables used for managing Combine subscriptions.
-    private var cancellables: Set<AnyCancellable> = []
 
     // MARK: - Initializers
 
@@ -95,23 +119,32 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
 
     /// Retrieves or creates a child presenter to manage nested state and actions.
     ///
+    /// This function either fetches an existing child presenter associated with the provided `uniqueId`
+    /// or creates a new one if none exists. The child presenter is associated with the current navigation path
+    /// and stored in the `children` collection.
+    ///
     /// - Parameters:
-    ///   - state: The state for the child presenter.
-    ///   - reducer: The reducer function for the child presenter.
-    /// - Returns: A configured child presenter instance.
+    ///   - state: The initial state to be managed by the child presenter.
+    ///   - reducer: The reducer function that defines how the child presenter will handle state changes.
+    ///   - uniqueId: A unique identifier to associate the child presenter with this navigation flow.
+    /// - Returns: A configured child presenter instance that manages the given `state` and responds to the `reducer`.
     public func getChild<ChildState: Actionnable>(
         for state: ChildState,
-        and reducer: Reducer<ChildState, NavState>
+        and reducer: Reducer<ChildState, NavState>,
+        bindTo uniqueId: UUID
     ) -> LBPresenter<ChildState, NavState> {
-        let presenter: LBPresenter<ChildState, NavState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
-        children.append(presenter)
-        presenter.objectWillChange
-            .sink { [weak self] _ in
-                // Update navigation state when a child presenter changes.
-                self?.navState = presenter.navState
-            }
-            .store(in: &cancellables)
-        return presenter
+        let presenterToReturn: LBPresenter<ChildState, NavState>
+
+        if let presenter = children[uniqueId] as? LBPresenter<ChildState, NavState> {
+            presenterToReturn = presenter
+        } else {
+            let presenter: LBPresenter<ChildState, NavState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
+            presenter.parent = self
+            children[uniqueId] = presenter
+            presenterToReturn = presenter
+        }
+
+        return presenterToReturn
     }
 
     /// Sends an action to the presenter, triggering state updates and effects.
@@ -194,8 +227,13 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
     /// Sends a navigation-specific action to the presenter.
     ///
     /// - Parameter navAction: The navigation action to process.
-    func sendNavigation(navAction: NavState.Action) {
-        navReducer(&navState, navAction)
+    func sendNavigation(navAction: any Actionning) {
+        let previousPath: NavState.Path = navState.path
+        if let parent {
+            parent.sendNavigation(navAction: navAction)
+        } else {
+            navReducer(&navState, navAction)
+        }
     }
 
     /// Creates a binding to synchronize a value with the UI and propagate changes back as actions.

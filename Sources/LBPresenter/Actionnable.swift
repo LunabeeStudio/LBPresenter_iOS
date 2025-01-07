@@ -21,5 +21,5 @@ public protocol Actionnable {
     /// Actions encapsulate events or operations that affect the state or
     /// trigger side effects. For example, they may represent user inputs,
     /// API requests, or navigation commands.
-    associatedtype Action: Sendable
+    associatedtype Action: Actionning
 }

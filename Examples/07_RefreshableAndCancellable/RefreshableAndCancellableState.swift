@@ -15,7 +15,7 @@ struct RefreshableAndCancellableState: PresenterState, Equatable {
         case data
     }
 
-    enum Action: Sendable, Equatable {
+    enum Action: Actionning {
         case refreshData, cancel
     }
 

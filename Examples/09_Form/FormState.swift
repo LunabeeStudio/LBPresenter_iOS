@@ -37,7 +37,7 @@ struct FormState: PresenterState, Equatable {
         case email
     }
 
-    enum Action: Sendable, Equatable {
+    enum Action: Actionning {
         case nameChanged(String), emailChanged(String), sliderChanged(Double), validate, bounce(BouncingState), focusChanged(Field?)
     }
 

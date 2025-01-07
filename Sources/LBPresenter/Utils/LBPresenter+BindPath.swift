@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-extension LBPresenter where NavState.Path == [NavState.Destination] {
+extension LBPresenter where NavState.Path == [Destinable<NavState.Destination>] {
     /// Creates a SwiftUI `Binding` that synchronizes a navigation path with the presenter's state
     /// and sends an action when the path's last element changes.
     ///
@@ -23,7 +23,7 @@ extension LBPresenter where NavState.Path == [NavState.Destination] {
     ///     two-way updates between SwiftUI views and the presenter's state.
     ///   - The provided `action` is sent whenever the path's last element is modified, appended, or removed.
     ///   - If the path is shortened (e.g., a "pop" operation), the action is called with `nil`.
-    public func bindPath(send action: @escaping (NavState.Path.Element?) -> NavState.Action) -> Binding<NavState.Path> {
+    public func bindPath(send action: @escaping (NavState.Destination?) -> NavState.Action) -> Binding<NavState.Path> {
         Binding(
             // The getter provides the current navigation path from the presenter's state.
             get: { self.navState.path },
@@ -32,11 +32,13 @@ extension LBPresenter where NavState.Path == [NavState.Destination] {
                 guard let self else { return }
 
                 // Determine the last element of the updated path, or nil if the path was shortened.
-                var destination: NavState.Path.Element? = newValue.last
-                if newValue.count < navState.path.count { destination = nil } // Handle "pop" operation
+                var destinable: NavState.Path.Element? = newValue.last
+                if newValue.count < navState.path.count {
+                    destinable = nil
+                } // Handle "pop" operation
 
                 // Send the action corresponding to the updated last element.
-                self.sendNavigation(navAction: action(destination))
+                self.sendNavigation(navAction: action(destinable?.destination))
             }
         )
     }

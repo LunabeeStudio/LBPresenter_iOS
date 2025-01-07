@@ -15,7 +15,7 @@ struct PresentState: PresenterState, Equatable {
         case data(PresentDetailModel?)
     }
 
-    enum Action: Sendable, Equatable {
+    enum Action: Actionning {
         case present(PresentDetailModel?)
     }
 

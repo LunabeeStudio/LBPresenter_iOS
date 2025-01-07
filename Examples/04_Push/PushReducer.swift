@@ -27,15 +27,4 @@ struct PushReducer {
             }
         }
     })
-
-    @MainActor static let navReducer: NavReducer<PushFlowState> = .init(navReduce: { state, action in
-        switch action {
-        case let .navigate(model):
-            state.navigate(to: model)
-        case .pop:
-            state.pop()
-        case .popToRoot:
-            state.popToRoot()
-        }
-    })
 }

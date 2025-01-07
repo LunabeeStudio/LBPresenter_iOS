@@ -26,7 +26,7 @@ private let readMe = """
   """
 
 struct Push: View {
-    @StateObject private var presenter: LBPresenter<PushState, PushFlowState> = .init(initialState: .init(uiState: .init(isLoading: false)), reducer: PushReducer.reducer, navState: .init(), navReducer: PushReducer.navReducer)
+    @StateObject private var presenter: LBPresenter<PushState, PushFlowState> = .init(initialState: .init(uiState: .init(isLoading: false)), reducer: PushReducer.reducer, navState: .init(), navReducer: DefaultNavPresenterState<PushDestination>.navReducer())
 
     @Environment(\.dismiss) private var dismiss
 
@@ -65,10 +65,10 @@ struct Push: View {
 
                 }
             }
-            .navigationDestination(for: PushFlowState.Destination.self) { destination in
+            .navigationDestination { (destination: PushDestination, uuid) in
                 switch destination {
                 case let .detail(model):
-                    PushDetail(presenter: presenter.getChild(for: .init(modelId: model.id), and: PushDetailReducer.reducer))
+                    PushDetail(presenter: presenter.getChild(for: .init(modelId: model.id), and: PushDetailReducer.reducer, bindTo: uuid))
                 }
             }
         }

@@ -14,7 +14,7 @@ struct PushState: PresenterState, Equatable {
         var isLoading: Bool
     }
 
-    enum Action: Sendable, Equatable {
+    enum Action: Actionning {
         case delayNavigate(PushDetailModel), removeLoading, pushDetail
     }
 

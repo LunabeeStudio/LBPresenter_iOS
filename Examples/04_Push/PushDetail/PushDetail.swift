@@ -9,17 +9,18 @@ import SwiftUI
 import LBPresenter
 
 struct PushDetail: View {
-    @ObservedObject private var presenter: LBPresenter<PushDetailState, PushFlowState>
-
-    init(presenter: LBPresenter<PushDetailState, PushFlowState>) {
-        self.presenter = presenter
-    }
+    @ObservedObject var presenter: LBPresenter<PushDetailState, PushFlowState>
 
     var body: some View {
         let _ = Self._printChanges()
         List {
             VStack {
-                Text(presenter.state.uiState.modelId ?? "")
+                switch presenter.state.uiState {
+                case .idle:
+                    ProgressView()
+                case .data(let string):
+                    Text(string)
+                }
                 Button {
                     presenter.send(.back)
                 } label: {
@@ -43,5 +44,6 @@ struct PushDetail: View {
             }
             .padding()
         }
+        .task(presenter, action: PushDetailState.Action.moveToData)
     }
 }

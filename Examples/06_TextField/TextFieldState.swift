@@ -19,7 +19,7 @@ struct TextFieldState: PresenterState, Equatable {
         var name: String
     }
 
-    enum Action: Sendable, Equatable {
+    enum Action: Actionning {
         case nameChanged(String)
     }
 

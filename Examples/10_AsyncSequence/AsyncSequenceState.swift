@@ -11,7 +11,7 @@ import SwiftUI
 import LBPresenter
 
 struct AsyncSequenceState: PresenterState, Equatable {
-    enum Action: Sendable, Equatable {
+    enum Action: Actionning {
         case startEmitter, startObserve, didReceiveData(Date)
     }
 
