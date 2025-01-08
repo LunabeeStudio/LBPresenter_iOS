@@ -53,4 +53,8 @@ extension NavPresenterState {
     public mutating func popToRoot() {
         path.removeAll()
     }
+
+    public func dismiss() {
+        fatalError()
+    }
 }

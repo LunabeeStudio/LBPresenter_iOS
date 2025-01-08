@@ -16,3 +16,9 @@ public protocol PresenterState: Actionnable {
     /// This state represents what the UI observes and reacts to.
     associatedtype UiState
 }
+
+extension PresenterState {
+    public func dismiss() {
+        fatalError()
+    }
+}

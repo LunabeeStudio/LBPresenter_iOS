@@ -10,16 +10,14 @@ import LBPresenter
 struct PresentReducer {
     @MainActor static let reducer: Reducer<PresentState, Never> = .init(reduce: { state, action in
         switch action {
-        case .present(nil):
-            switch state.uiState {
-            case .data:
-                state.uiState = .data(nil)
-                return .none
-            }
         case let .present(model):
             switch state.uiState {
             case .data:
-                state.uiState = .data(model)
+                if let model {
+                    state.present(model)
+                } else {
+                    state.dismiss()
+                }
                 return .none
             }
         }
