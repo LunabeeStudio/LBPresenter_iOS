@@ -8,7 +8,7 @@
 import SwiftUI
 import LBPresenter
 
-struct PresentDetailModel: Identifiable, Equatable, Hashable {
+struct PresentDetailModel: Identifiable, Hashable {
     let id: String
 }
 

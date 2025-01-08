@@ -9,16 +9,6 @@ import Combine
 import SwiftUI
 import Foundation
 
-@MainActor
-public protocol LBPresenterProtocol: ObservableObject {
-    func dismiss()
-}
-
-@MainActor
-protocol LBNavPresenter: LBPresenterProtocol {
-    func sendNavigation(navAction: any Actionning)
-}
-
 public protocol Actionning: Sendable, Equatable {}
 
 /// A generic presenter that manages state, navigation, and effects for a SwiftUI view using a reducer pattern.
@@ -29,7 +19,7 @@ public protocol Actionning: Sendable, Equatable {}
 /// - Provides mechanisms to send actions, manage child presenters, and create bindings for UI synchronization.
 ///
 /// Conforms to `LBPresenterProtocol` and is designed to work seamlessly with SwiftUI's `ObservableObject` system.
-public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>: LBNavPresenter {
+public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>: LBNavPresenter, LBSheetPresenter {
     /// A collection of child presenters for managing nested state and logic.
     ///
     /// Each child is uniquely identified by a `UUID` and is associated with a specific navigation path.
@@ -43,15 +33,7 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
     /// This is weak to avoid strong reference cycles.
     private weak var parent: (any LBNavPresenter)?
 
-    private weak var sheetParent: (any LBPresenterProtocol)?
-
-    @MainActor public func dismiss() {
-        if let sheetParent {
-            sheetParent.dismiss()
-        } else {
-            state.dismiss()
-        }
-    }
+    private weak var sheetParent: (any LBPresenterProtocol & LBSheetPresenter)?
     
     /// The current state of the presenter, published to notify SwiftUI views of changes.
     ///
@@ -150,6 +132,7 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
         } else {
             let presenter: LBPresenter<ChildState, NavState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
             presenter.parent = self
+            presenter.sheetParent = sheetParent
             children[uniqueId] = presenter
             presenterToReturn = presenter
         }
@@ -265,6 +248,14 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
                 self?.send(action(newValue))
             }
         )
+    }
+
+    @MainActor func dismiss() {
+        if let sheetParent {
+            sheetParent.dismiss()
+        } else {
+            state.dismiss()
+        }
     }
 }
 
