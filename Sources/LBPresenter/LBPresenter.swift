@@ -9,19 +9,6 @@ import Combine
 import SwiftUI
 import Foundation
 
-@MainActor
-public protocol LBPresenterProtocol: ObservableObject {}
-
-@MainActor
-protocol LBSheetPresenter {
-    func dismiss()
-}
-
-@MainActor
-protocol LBNavPresenter: LBPresenterProtocol {
-    func sendNavigation(navAction: any Actionning)
-}
-
 public protocol Actionning: Sendable, Equatable {}
 
 /// A generic presenter that manages state, navigation, and effects for a SwiftUI view using a reducer pattern.
