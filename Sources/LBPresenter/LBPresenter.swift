@@ -132,6 +132,7 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
         } else {
             let presenter: LBPresenter<ChildState, NavState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
             presenter.parent = self
+            presenter.sheetParent = sheetParent
             children[uniqueId] = presenter
             presenterToReturn = presenter
         }
