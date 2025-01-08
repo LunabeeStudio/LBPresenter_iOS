@@ -47,14 +47,6 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
     private weak var parent: (any LBNavPresenter)?
 
     private weak var sheetParent: (any LBPresenterProtocol & LBSheetPresenter)?
-
-    @MainActor func dismiss() {
-        if let sheetParent {
-            sheetParent.dismiss()
-        } else {
-            state.dismiss()
-        }
-    }
     
     /// The current state of the presenter, published to notify SwiftUI views of changes.
     ///
@@ -268,6 +260,14 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
                 self?.send(action(newValue))
             }
         )
+    }
+
+    @MainActor func dismiss() {
+        if let sheetParent {
+            sheetParent.dismiss()
+        } else {
+            state.dismiss()
+        }
     }
 }
 
