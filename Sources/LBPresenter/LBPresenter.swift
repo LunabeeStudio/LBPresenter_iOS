@@ -44,7 +44,6 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
     private weak var parent: (any LBNavPresenter)?
 
     private weak var sheetParent: (any LBPresenterProtocol)?
-    private var presentedChild: (any LBPresenterProtocol)?
 
     @MainActor public func dismiss() {
         if let sheetParent {
@@ -52,7 +51,6 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
         } else {
             state.dismiss()
         }
-        presentedChild = nil
     }
     
     /// The current state of the presenter, published to notify SwiftUI views of changes.
@@ -279,7 +277,6 @@ public extension LBPresenter where State: SheetPresenterState {
     ) -> LBPresenter<ChildState, NavChildState> {
         let presenter: LBPresenter<ChildState, NavChildState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
         presenter.sheetParent = self
-        presentedChild = presenter
         return presenter
     }
 
@@ -289,7 +286,6 @@ public extension LBPresenter where State: SheetPresenterState {
     ) -> LBPresenter<ChildState, Never> {
         let presenter: LBPresenter<ChildState, Never> = .init(initialState: state, reducer: reducer)
         presenter.sheetParent = self
-        presentedChild = presenter
         return presenter
     }
 }
