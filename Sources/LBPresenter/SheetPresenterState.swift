@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol SheetPresenterState: Actionnable, Equatable {
+public protocol SheetPresenterState: PresenterState, Equatable {
     associatedtype Sheet: Hashable & Sendable
 
     var presented: Sheet? { get set }
