@@ -50,7 +50,6 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
         if let sheetParent {
             sheetParent.dismiss()
         } else {
-            print("coucou")
             state.dismiss()
         }
         presentedChild = nil
