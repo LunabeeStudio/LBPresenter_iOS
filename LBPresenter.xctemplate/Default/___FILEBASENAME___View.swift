@@ -6,7 +6,7 @@ import SwiftUI
 import LBPresenter
 
 struct ___FILEBASENAMEASIDENTIFIER___: View {
-    @StateObject var presenter: LBPresenter<___VARIABLE_productName:identifier___State, Never>
+    @StateObject var presenter: LBPresenter<___VARIABLE_productName:identifier___State, Never> = .init(initialState: .init(), reducer: ___VARIABLE_productName:identifier___Reducer.reducer)
 
     var body: some View {
         contentView
