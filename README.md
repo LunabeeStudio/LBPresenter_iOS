@@ -156,9 +156,11 @@ case .pushDetail:
     }
 ```
 
-In the screen presenting you'll need to define a navigationDestination (Note that the next presenter is created from the previous one thanks to the `getChild` method so that it's lifecycle is managed by it's parent and to avoid recreating it you must pass the uuid generated for you)
+In the screen presenting you'll need to bind the path with the presenter and define a navigationDestination (Note that the next presenter is created from the previous one thanks to the `getChild` method so that it's lifecycle is managed by it's parent and to avoid recreating it you must pass the uuid generated for you)
 
 ```swift
+NavigationStack(path: presenter.bindPath(send: PushFlowState.Action.navigate)) {
+}
 .navigationDestination { (destination: PushDestination, uuid) in
     switch destination {
     case let .detail(model):
