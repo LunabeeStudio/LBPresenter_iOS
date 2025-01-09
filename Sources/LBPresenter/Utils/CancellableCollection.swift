@@ -10,7 +10,7 @@ import Foundation
 
 /// A collection for managing `AnyCancellable` subscriptions, grouped by unique identifiers.
 /// This helps in organizing and canceling subscriptions efficiently.
-public final class CancellablesCollection {
+final class CancellablesCollection {
     // MARK: - Properties
 
     /// Storage for cancellables, grouped by their unique identifiers.
@@ -26,7 +26,7 @@ public final class CancellablesCollection {
     /// - Parameters:
     ///   - cancellable: The `AnyCancellable` to store.
     ///   - id: A unique identifier for grouping cancellables.
-    public func insert(
+    func insert(
         _ cancellable: AnyCancellable,
         at id: String?
     ) {
@@ -41,7 +41,7 @@ public final class CancellablesCollection {
     /// - Parameters:
     ///   - cancellable: The `AnyCancellable` to remove.
     ///   - id: The identifier where the cancellable is stored.
-    public func remove(
+    func remove(
         _ cancellable: AnyCancellable,
         at id: String?
     ) {
@@ -57,7 +57,7 @@ public final class CancellablesCollection {
     /// Cancels all cancellables associated with a specific identifier.
     ///
     /// - Parameter id: The identifier whose cancellables should be canceled.
-    public func cancel(
+    func cancel(
         id: String?
     ) {
         guard let id else { return }

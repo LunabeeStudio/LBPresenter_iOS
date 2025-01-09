@@ -9,8 +9,6 @@ import Combine
 import SwiftUI
 import Foundation
 
-public protocol Actionning: Sendable, Equatable {}
-
 /// A generic presenter that manages state, navigation, and effects for a SwiftUI view using a reducer pattern.
 ///
 /// The presenter:
