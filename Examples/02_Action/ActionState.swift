@@ -18,9 +18,5 @@ struct ActionState: PresenterState, Equatable {
         case increment, decrement
     }
 
-    var uiState: UiState
-
-    init(uiState: UiState) {
-        self.uiState = uiState
-    }
+    var uiState: UiState = .init(count: 0)
 }

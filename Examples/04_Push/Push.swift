@@ -26,7 +26,7 @@ private let readMe = """
   """
 
 struct Push: View {
-    @StateObject private var presenter: LBPresenter<PushState, PushFlowState> = .init(initialState: .init(uiState: .init(isLoading: false)), reducer: PushReducer.reducer, navState: .init(), navReducer: DefaultNavPresenterState<PushDestination>.navReducer())
+    @StateObject private var presenter: LBPresenter<PushState, PushFlowState> = .init(initialState: .init(uiState: .init(isLoading: false)), reducer: PushReducer.reducer, navState: .init(), navReducer: PushFlowState.navReducer())
 
     @Environment(\.dismiss) private var dismiss
 
