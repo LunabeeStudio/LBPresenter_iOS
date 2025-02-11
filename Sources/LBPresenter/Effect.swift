@@ -37,7 +37,7 @@ public enum Effect<Action, NavigationAction> {
         cancelId: String? = nil
     )
 
-    case dismiss
+    case dismiss(all: Bool)
 
     /// Cancels an ongoing side effect associated with a specific `cancelId`.
     ///
