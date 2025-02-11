@@ -26,6 +26,7 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
     /// This allows efficient tracking of child presenters, ensuring they can be updated or removed
     /// based on changes to the navigation state.
     private var children: [UUID: any LBPresenterProtocol] = [:]
+    var presentedChild: (any LBPresenterProtocol)?
 
     /// A reference to the parent presenter, used to manage hierarchical navigation flows.
     ///
@@ -171,8 +172,8 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
                 // Wait for the task to finish and clean up after completion
                 _ = await task.result // Wait for the task to complete
             }
-        case .dismiss:
-            dismiss()
+        case let .dismiss(all):
+            all ? dismissAll() : dismiss()
         case let .cancel(cancelId):
             // Cancel the running effect task with the corresponding id.
             cancellationCancellables.cancel(id: cancelId)
@@ -250,8 +251,18 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
         )
     }
 
-    @MainActor func dismiss() {
+    @MainActor func dismissAll() {
         if let sheetParent {
+            self.sheetParent?.presentedChild = nil
+            sheetParent.dismiss()
+        } else {
+            state.dismiss()
+        }
+    }
+
+    @MainActor func dismiss() {
+        if let sheetParent, sheetParent.presentedChild === self {
+            self.sheetParent?.presentedChild = nil
             sheetParent.dismiss()
         } else {
             state.dismiss()
@@ -267,6 +278,7 @@ public extension LBPresenter where State: SheetPresenterState {
         navReducer: NavReducer<NavChildState>
     ) -> LBPresenter<ChildState, NavChildState> {
         let presenter: LBPresenter<ChildState, NavChildState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
+        self.presentedChild = presenter
         presenter.sheetParent = self
         return presenter
     }
@@ -276,6 +288,7 @@ public extension LBPresenter where State: SheetPresenterState {
         reducer: Reducer<ChildState, Never>
     ) -> LBPresenter<ChildState, Never> {
         let presenter: LBPresenter<ChildState, Never> = .init(initialState: state, reducer: reducer)
+        self.presentedChild = presenter
         presenter.sheetParent = self
         return presenter
     }

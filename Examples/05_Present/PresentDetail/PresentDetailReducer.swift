@@ -15,7 +15,7 @@ struct PresentDetailReducer {
             case .noData:
                 return .none
             case .data:
-                return .dismiss
+                return .dismiss(all: false)
             }
         }
     })

@@ -9,5 +9,7 @@ import Foundation
 
 @MainActor
 protocol LBSheetPresenter {
+    var presentedChild: (any LBPresenterProtocol)? { get set }
     func dismiss()
+    func dismissAll()
 }
