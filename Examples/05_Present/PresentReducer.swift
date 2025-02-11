@@ -13,11 +13,7 @@ struct PresentReducer {
         case let .present(model):
             switch state.uiState {
             case .data:
-                if let model {
-                    state.present(model)
-                } else {
-                    state.dismiss()
-                }
+                state.presented = model
                 return .none
             }
         }

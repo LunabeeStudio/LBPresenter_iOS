@@ -254,18 +254,18 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
     @MainActor func dismissAll() {
         if let sheetParent {
             self.sheetParent?.presentedChild = nil
-            sheetParent.dismiss()
+            sheetParent.dismissAll()
         } else {
             state.dismiss()
         }
     }
 
     @MainActor func dismiss() {
-        if let sheetParent, presentedChild == nil {
+        if let sheetParent, sheetParent.presentedChild === self {
+            self.sheetParent?.presentedChild = nil
             sheetParent.dismiss()
         } else {
             state.dismiss()
-            presentedChild = nil
         }
     }
 }
