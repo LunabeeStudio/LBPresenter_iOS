@@ -14,10 +14,6 @@ public protocol SheetPresenterState: PresenterState, Equatable {
 }
 
 public extension SheetPresenterState {
-    mutating func present(_ sheet: Sheet) {
-        presented = sheet
-    }
-
     mutating func dismiss() {
         presented = nil
     }

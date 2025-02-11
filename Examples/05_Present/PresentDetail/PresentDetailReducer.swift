@@ -17,6 +17,16 @@ struct PresentDetailReducer {
             case .data:
                 return .dismiss(all: false)
             }
+        case .dismissAll:
+            switch state.uiState {
+            case .noData:
+                return .none
+            case .data:
+                return .dismiss(all: true)
+            }
+        case let .present(model):
+            state.presented = model
+            return .none
         }
     })
 }
