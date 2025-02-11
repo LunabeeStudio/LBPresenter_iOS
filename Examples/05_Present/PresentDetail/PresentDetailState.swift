@@ -9,7 +9,8 @@ import Foundation
 import SwiftUI
 import LBPresenter
 
-struct PresentDetailState: PresenterState, Equatable {
+struct PresentDetailState: SheetPresenterState, Equatable {
+    typealias Sheet = PresentDetailModel
 
     enum UiState: Equatable {
         case noData
@@ -17,10 +18,11 @@ struct PresentDetailState: PresenterState, Equatable {
     }
 
     enum Action: Actionning {
-        case dismiss
+        case dismiss, dismissAll, present(Sheet?)
     }
 
     var uiState: UiState
+    var presented: Sheet?
 
     init(uiState: UiState) {
         self.uiState = uiState
