@@ -277,19 +277,27 @@ public extension LBPresenter where State: SheetPresenterState {
         navState: NavChildState,
         navReducer: NavReducer<NavChildState>
     ) -> LBPresenter<ChildState, NavChildState> {
-        let presenter: LBPresenter<ChildState, NavChildState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
-        self.presentedChild = presenter
-        presenter.sheetParent = self
-        return presenter
+        if let presentedChild = self.presentedChild as? LBPresenter<ChildState, NavChildState> {
+            return presentedChild
+        } else {
+            let presenter: LBPresenter<ChildState, NavChildState> = .init(initialState: state, reducer: reducer, navState: navState, navReducer: navReducer)
+            self.presentedChild = presenter
+            presenter.sheetParent = self
+            return presenter
+        }
     }
 
     func getPresentedChild<ChildState: Actionnable>(
         for state: ChildState,
         reducer: Reducer<ChildState, Never>
     ) -> LBPresenter<ChildState, Never> {
-        let presenter: LBPresenter<ChildState, Never> = .init(initialState: state, reducer: reducer)
-        self.presentedChild = presenter
-        presenter.sheetParent = self
-        return presenter
+        if let presentedChild = self.presentedChild as? LBPresenter<ChildState, Never> {
+            return presentedChild
+        } else {
+            let presenter: LBPresenter<ChildState, Never> = .init(initialState: state, reducer: reducer)
+            self.presentedChild = presenter
+            presenter.sheetParent = self
+            return presenter
+        }
     }
 }
