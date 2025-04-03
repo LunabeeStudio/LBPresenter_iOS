@@ -42,6 +42,10 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
     /// Modifications to the state are restricted to the presenter logic via the reducer.
     public private(set) var state: State {
         willSet {
+            // In order to manage presentedChild removal, on interactive dismiss gesture
+            if let presenterState = newValue as? any SheetPresenterState, presenterState.presented == nil {
+                self.presentedChild = nil
+            }
             // Notify subscribers only when the new value differs from the old value.
             objectWillChange.send(with: newValue, oldValue: state)
         }
@@ -265,7 +269,6 @@ public final class LBPresenter<State: Actionnable, NavState: NavPresenterState>:
             sheetParent.dismiss()
         } else {
             state.dismiss()
-            presentedChild = nil
         }
     }
 }
