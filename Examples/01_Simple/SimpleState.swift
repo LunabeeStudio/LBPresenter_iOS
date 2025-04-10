@@ -9,16 +9,23 @@ import Foundation
 import SwiftUI
 import LBPresenter
 
-struct SimpleState: PresenterState, Equatable {
-
-    enum UiState: Equatable {
+struct SimpleState: PresenterState {
+    enum UiState {
         case data
     }
-    enum Action: Actionning {}
 
-    var uiState: UiState
+    enum Action: Actionning {
+        case click, onTask
+    }
 
-    init(uiState: UiState) {
-        self.uiState = uiState
+    var uiState: UiState = .data
+}
+
+extension SimpleState: Reducable {
+    static func reduce(_ state: inout SimpleState, _ action: SimpleState.Action) -> SimpleEffect<SimpleState.Action> {
+        switch action {
+        case .click, .onTask:
+            return .none
+        }
     }
 }

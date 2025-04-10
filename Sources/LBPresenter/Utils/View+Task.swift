@@ -33,4 +33,14 @@ extension View {
             await presenter.send(action) // Send the provided action to the presenter asynchronously.
         }
     }
+
+    public func task<State: PresenterState>(
+        _ presenter: LBSimplePresenter<State>,
+        action: State.Action
+    ) -> some View where State.Action: Sendable {
+        // Use the `.task` modifier to execute the specified asynchronous action when the view appears.
+        self.task {
+            await presenter.send(action) // Send the provided action to the presenter asynchronously.
+        }
+    }
 }

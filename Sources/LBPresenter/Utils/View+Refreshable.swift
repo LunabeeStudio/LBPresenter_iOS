@@ -32,4 +32,14 @@ extension View {
             await presenter.send(action) // Send the specified action to the presenter asynchronously.
         }
     }
+    
+    public func refreshable<State: PresenterState>(
+        _ presenter: LBSimplePresenter<State>,
+        action: State.Action
+    ) -> some View where State.Action: Sendable {
+        // The `.refreshable` modifier handles the pull-to-refresh interaction and executes the provided async code.
+        self.refreshable {
+            await presenter.send(action) // Send the specified action to the presenter asynchronously.
+        }
+    }
 }

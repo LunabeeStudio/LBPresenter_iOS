@@ -19,9 +19,9 @@ struct AsyncSequenceState: PresenterState, Equatable {
         case loading, data(Date)
     }
 
-    var state: UiState
+    var uiState: UiState
 
     init(state: UiState = .loading) {
-        self.state = state
+        self.uiState = state
     }
 }
