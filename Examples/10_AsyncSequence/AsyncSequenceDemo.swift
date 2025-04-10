@@ -40,7 +40,7 @@ struct AsyncSequenceDemo: View {
     @ViewBuilder
     var content: some View {
         let _ = Self._printChanges()
-        switch presenter.state.state {
+        switch presenter.state.uiState {
         case .loading:
             Text("Loading...")
             ProgressView()

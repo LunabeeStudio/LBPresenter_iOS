@@ -18,13 +18,20 @@ private let readMe = """
   """
 
 struct Simple: View {
-    @StateObject private var presenter: LBPresenter<SimpleState, Never> = .init(initialState: .init(uiState: .data), reducer: SimpleReducer.reducer)
+    @Presenter(state: .init()) private var presenter: LBSimplePresenter<SimpleState>
 
     var body: some View {
-        let _ = Self._printChanges()
-        Form {
-            AboutView(readMe: readMe)
-            Text("Hello World!")
+        contentView
+            .task(presenter, action: .onTask)
+    }
+
+    @ViewBuilder
+    var contentView: some View {
+        switch(presenter.uiState) {
+        case .data:
+            Button("test") {
+                presenter(.click)
+            }
         }
     }
 }

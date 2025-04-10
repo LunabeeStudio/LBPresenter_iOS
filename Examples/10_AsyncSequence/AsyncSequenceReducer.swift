@@ -23,7 +23,7 @@ struct AsyncSequenceReducer {
             }
         case let .didReceiveData(date):
             print("did receive data")
-            state.state = .data(date)
+            state.uiState = .data(date)
             return .none
         }
     })
