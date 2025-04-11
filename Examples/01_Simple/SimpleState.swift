@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 import LBPresenter
 
-struct SimpleState: PresenterState {
+struct SimpleState: PresenterState, Equatable {
     enum UiState {
         case data
     }

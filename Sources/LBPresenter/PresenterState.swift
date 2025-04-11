@@ -10,7 +10,7 @@
 ///
 /// Conforming types represent the current state of the application or feature
 /// and facilitate the handling of user or system-initiated actions.
-public protocol PresenterState: Actionnable, Equatable {
+public protocol PresenterState: Actionnable {
     /// The type that encapsulates the state visible to the UI.
     ///
     /// This state represents what the UI observes and reacts to.
