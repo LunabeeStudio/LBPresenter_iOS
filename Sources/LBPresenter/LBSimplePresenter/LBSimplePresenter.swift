@@ -92,8 +92,9 @@ public final class LBSimplePresenter<State: PresenterState & Reducable & Sendabl
                 // Wait for the task to finish and clean up after completion
                 _ = await task.result // Wait for the task to complete
             } onCancel: { [weak self] in
+                guard let self else { return }
                 Task { @MainActor in
-                    self?.cancellationCancellables.cancel(id: myCancelId)
+                    self.cancellationCancellables.cancel(id: myCancelId)
                 }
             }
         case let .cancel(cancelId):
